@@ -1,16 +1,33 @@
 import { DefaultTheme } from '@react-navigation/native'
-import { useEffect } from 'react'
-import { Text, View } from 'react-native'
+import React, { useEffect } from 'react'
+import { Pressable, Text, View } from 'react-native'
 import { Eventful } from 'types'
+import { Avatar, AvatarGroup } from '../components/Avatar'
+import { Card } from '../components/Card'
+import { H5, H6 } from '../components/Header'
+import { Time } from '../components/Time'
 import { useEvents } from '../eventfulLib/event'
 import { useSession } from '../eventfulLib/session'
 import { Agenda } from '../features/Agenda'
 import { s } from '../libs/styles'
 
 const Event = ({ event }: { event: Eventful.API.EventGet }) => (
-  <View>
-    <Text>{event.name}</Text>
-  </View>
+  <Card
+    shadowProps={{
+      style: [s.ass],
+    }}
+    style={[s.flx_r, s.jcsb]}
+  >
+    <View style={[s.flx_c]}>
+      <H5 style={[s.bold]}>{event.name}</H5>
+      <Time time={event.time} />
+    </View>
+    <AvatarGroup
+      avatars={event.who.map((user) => ({
+        username: user.username,
+      }))}
+    />
+  </Card>
 )
 
 export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) => {
@@ -19,16 +36,24 @@ export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) =
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Agenda',
-      headerStyle: { backgroundColor: DefaultTheme.colors.background },
-      headerShadowVisible: false,
       headerLeft: () => null,
+      headerTitle: '',
+      headerRight: () => (
+        <Pressable onPress={() => navigation.push('User', { user: session?._id })}>
+          <Avatar size="medium" username={session?.username} />
+        </Pressable>
+      ),
     })
   }, [])
 
   return (
     <View style={[s.c]}>
-      <Agenda items={events} noTimeHeader="TBD" renderItem={(event) => <Event event={event} />} />
+      <Agenda
+        items={events}
+        noTimeHeader="TBD"
+        renderItem={(event) => <Event event={event} />}
+        renderOnEveryDay={false}
+      />
     </View>
   )
 }

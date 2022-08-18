@@ -12,6 +12,20 @@ const range = <K extends string, T>(len: number, cb: (i: number, len: number) =>
 
 const lerp = (min: number, max: number, pct: number) => min * (1 - pct) + max * pct
 
+export const spacing = {
+  small: 5,
+  normal: 10,
+  container: 15,
+  inputPadding: 8,
+  controlPadding: 10,
+}
+
+export const radius = {
+  normal: 5,
+}
+
+export type HeaderSize = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
 /**
  * one: use for pretty much all controls and whatever
  *
@@ -37,20 +51,20 @@ export const c = {
   surf: '#FFFFFF',
   err: '#B00020',
   onOneLight: '#263238',
-  onOneDark: '#263238',
+  onOneDark: '#F5F5F5',
   onTwoLight: '#212121',
-  onTwoDark: '#212121',
+  onTwoDark: '#ECEFF1',
   onBg: '#000000',
   onSurf: '#000000',
   onErr: '#FFFFFF',
 }
 
 export const s = StyleSheet.create({
-  ...(range(6, (i) => ({
+  ...(range(7, (i) => ({
     [`h${i}`]: {
-      fontSize: lerp(14, 50, (6 - i) / 6),
+      fontSize: lerp(16, 50, (6 - i) / 6),
     },
-  })) as Record<'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6', TextStyle>),
+  })) as Record<HeaderSize, TextStyle>),
   flx_r: {
     flexDirection: 'row',
   },
@@ -63,13 +77,24 @@ export const s = StyleSheet.create({
   flx_cr: {
     flexDirection: 'column-reverse',
   },
+  flx_0: {
+    flex: 0,
+  },
   flx_1: {
     flex: 1,
   },
+  flx_2: {
+    flex: 2,
+  },
+  flx_3: {
+    flex: 3,
+  },
+  ais: { alignItems: 'stretch' },
   aifs: { alignItems: 'flex-start' },
   aic: { alignItems: 'center' },
   aife: { alignItems: 'flex-end' },
   jcc: { justifyContent: 'center' },
+  jcfs: { justifyContent: 'flex-start' },
   jcfe: { justifyContent: 'flex-end' },
   jcsb: { justifyContent: 'space-between' },
   jcsa: { justifyContent: 'space-around' },
@@ -79,6 +104,10 @@ export const s = StyleSheet.create({
   ass: { alignSelf: 'stretch' },
   /** container */
   c: {
-    padding: 15,
+    padding: spacing.container,
+    borderRadius: 5,
+  },
+  bold: {
+    fontWeight: 'bold',
   },
 })

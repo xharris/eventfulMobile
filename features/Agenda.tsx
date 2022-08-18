@@ -2,9 +2,11 @@ import { useFormik } from 'formik'
 import moment from 'moment'
 import { ReactNode, useEffect, useMemo } from 'react'
 import { Checkbox } from '../components/Checkbox'
-import { View } from 'react-native'
-import { H1, H2, H3, H4 } from '../components/Header'
+import { SectionList, View, Text } from 'react-native'
+import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
+import { c, s, spacing } from '../libs/styles'
+import { Spacer } from '../components/Spacer'
 
 // TODO: show past days with less opacity
 
@@ -15,16 +17,19 @@ interface Item {
 }
 
 interface DayItems<I extends Item> {
+  key: string
   day: string
   items: I[]
 }
 
 interface MonthItems<I extends Item> {
+  key: string
   month: string
   days: DayItems<I>[]
 }
 
 interface YearItems<I extends Item> {
+  key: string
   year: string
   months: MonthItems<I>[]
 }
@@ -34,21 +39,29 @@ interface YearProps {
 }
 
 const Year = ({ label }: YearProps) => (
-  <View
-    style={{
-      alignItems: 'center',
-    }}
-  >
+  <View style={[s.flx_r, s.aic, { paddingVertical: spacing.container }]}>
     <View
-      style={{
-        borderBottom: '1px solid $disabled',
-      }}
+      style={[
+        s.flx_1,
+        {
+          borderBottomColor: c.oneDark,
+          borderBottomWidth: 1,
+          height: 0,
+          marginHorizontal: spacing.container,
+        },
+      ]}
     />
-    <H3>{label}</H3>
+    <H5>{label}</H5>
     <View
-      style={{
-        borderBottom: '1px solid $disabled',
-      }}
+      style={[
+        s.flx_1,
+        {
+          borderBottomColor: c.oneDark,
+          borderBottomWidth: 1,
+          height: 0,
+          marginHorizontal: spacing.container,
+        },
+      ]}
     />
   </View>
 )
@@ -60,44 +73,34 @@ interface MonthProps<I extends Item> {
 }
 
 const Month = <I extends Item = Item>({ label, days, renderItem }: MonthProps<I>) => (
-  <View column View="0" style={{ gap: '$small' }}>
-    <H3
-      style={{
-        textAlign: 'center',
-        color: '#616161',
-        background: 'linear-gradient(to bottom, $background 90%, transparent)',
-        zIndex: 10,
-        padding: '0.5rem 0',
-        position: 'sticky',
-        top: -2,
-      }}
-    >
-      {label}
-    </H3>
-    <View column style={{ gap: '$small' }}>
+  <View style={[s.flx_c]}>
+    <H3>{label}</H3>
+    <View style={[s.flx_c]}>
       {days.map((day) => (
-        <View key={day.day} View="0" style={{ position: 'relative', alignItems: 'View-start' }}>
-          <H4
-            style={{
-              color: '$disabled',
-              position: 'sticky',
-              left: 0,
-              top: 0,
-              padding: '0.25rem 0',
-              minWidth: 35,
-            }}
-          >
-            {day.day}
-          </H4>
-          <View column style={{ gap: '$small' }}>
-            {day.items.map((item) => (
-              <View key={item._id.toString()}>{renderItem(item)}</View>
-            ))}
-          </View>
-          <View View="0" style={{ minWidth: '$small' }} />
+        <Day key={day.day} label={day.day} items={day.items} renderItem={renderItem} />
+      ))}
+    </View>
+  </View>
+)
+
+interface DayProps<I extends Item> {
+  label: string
+  items: I[]
+  renderItem: (item: I) => ReactNode
+}
+
+const Day = <I extends Item = Item>({ label, items, renderItem }: DayProps<I>) => (
+  <View style={[s.flx_r]}>
+    <H4 style={{ minWidth: 26, marginTop: 6, opacity: 0.3 }}>{label}</H4>
+    <Spacer size={spacing.normal} />
+    <View style={[s.flx_c, s.flx_1]}>
+      {items.map((item) => (
+        <View key={item._id.toString()} style={[s.ass, s.ais, { marginBottom: spacing.normal }]}>
+          {renderItem(item)}
         </View>
       ))}
     </View>
+    <View />
   </View>
 )
 
@@ -124,7 +127,11 @@ export const Agenda = <I extends Item = Item>({
   showYearSeparator = true,
   renderOnEveryDay = true,
 }: AgendaProps<I>) => {
-  const { values: options, handleChange } = useFormik<AgendaOptions>({
+  const {
+    values: options,
+    handleChange,
+    setFieldValue,
+  } = useFormik<AgendaOptions>({
     initialValues: {
       tbd: true,
     },
@@ -178,14 +185,17 @@ export const Agenda = <I extends Item = Item>({
     return Object.entries(retItems)
       .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
       .map(([year, months]) => ({
+        key: `${year}`,
         year,
         months: Object.entries(months)
           .sort((a, b) => moment(a[0], 'MMMM').month() - moment(b[0], 'MMMM').month())
           .map(([month, days]) => ({
+            key: `${year}-${month}`,
             month: `${month} '${year.slice(2, 4)}`,
             days: Object.entries(days)
               .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
               .map(([day, items]) => ({
+                key: `${year}-${month}-${day}`,
                 day,
                 items,
               })),
@@ -193,69 +203,63 @@ export const Agenda = <I extends Item = Item>({
       })) as YearItems<I>[]
   }, [items, renderOnEveryDay])
 
+  const allItems = useMemo(
+    () => [
+      ...(options.tbd
+        ? [
+            {
+              title: `${noTimeHeader}${
+                !!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''
+              }`,
+              data: [tbdItems],
+            },
+          ]
+        : []),
+      ...datedItems.reduce(
+        (arr, year) => [
+          ...arr,
+          // {
+          //   title: year.year,
+          //   data: [],
+          // },
+          ...year.months.map((month) => ({
+            title: month.month,
+            data: month.days,
+          })),
+        ],
+        [] as { title: string; data: DayItems<I>[] }[]
+      ),
+    ],
+    [tbdItems, datedItems, options]
+  )
+
   return (
-    <View
-      column
-      style={{
-        padding: '2px 0px',
-        overflow: 'auto',
-        justifyContent: !items.length ? 'center' : 'View-start',
-        gap: '$small',
-      }}
-    >
+    <View style={[s.flx_c]}>
       {!!items.length && (
-        <View View="0">
+        <View>
           <Checkbox
-            name="tbd"
             checked={options.tbd}
-            onChange={handleChange}
+            onChange={(v) => setFieldValue('tbd', v)}
             label={`${noTimeHeader}${!!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''}`}
           />
         </View>
       )}
-      {options.tbd && !!tbdItems.items.length && (
-        <View
-          column
-          style={{
-            ViewGrow: 0,
-            ViewShrink: 0,
-            ViewBasis: 'auto',
-            padding: '2px 0px',
-            overflow: 'auto',
+      {!!allItems.length ? (
+        <SectionList
+          sections={allItems}
+          keyExtractor={(item) => item.key}
+          renderItem={({ item }) => (
+            <Day<I> label={item.day} items={item.items} renderItem={renderItem} />
+          )}
+          renderSectionHeader={({ section }) => (
+            <H4 style={[s.c, { opacity: 0.5 }]}>{section.title}</H4>
+          )}
+          // SectionSeparatorComponent={() => <H5>hi</H5>}
+          stickySectionHeadersEnabled
+          contentContainerStyle={{
+            padding: 4,
           }}
-        >
-          <Month label={noTimeHeader} days={[tbdItems]} renderItem={renderItem} />
-        </View>
-      )}
-      {!!items.length ? (
-        <View
-          column
-          style={{
-            ViewGrow: 1,
-            ViewShrink: 0,
-            padding: '2px 0px',
-            overflow: 'auto',
-            overflowX: 'hidden',
-            justifyContent: !items.length ? 'center' : 'View-start',
-          }}
-        >
-          {datedItems.map((year) => (
-            <View key={year.year} column className="years" style={{ gap: '$small' }}>
-              {showYearSeparator && <Year label={year.year} />}
-              <View column className="months" style={{ gap: '$small' }}>
-                {year.months.map((month) => (
-                  <Month
-                    key={month.month}
-                    label={month.month}
-                    days={month.days}
-                    renderItem={renderItem}
-                  />
-                ))}
-              </View>
-            </View>
-          ))}
-          <View className="filler" fill />
-        </View>
+        />
       ) : noItemsText ? (
         <H1 style={{ color: '$disabled', fontStyle: 'italic', textAlign: 'center' }}>
           {noItemsText}
