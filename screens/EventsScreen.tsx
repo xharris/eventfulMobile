@@ -1,6 +1,6 @@
 import { DefaultTheme } from '@react-navigation/native'
 import React, { useEffect } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, PressableProps, Text, View } from 'react-native'
 import { Eventful } from 'types'
 import { Avatar, AvatarGroup } from '../components/Avatar'
 import { Card } from '../components/Card'
@@ -11,12 +11,19 @@ import { useSession } from '../eventfulLib/session'
 import { Agenda } from '../features/Agenda'
 import { s } from '../libs/styles'
 
-const Event = ({ event }: { event: Eventful.API.EventGet }) => (
+const Event = ({
+  event,
+  onPress,
+}: {
+  event: Eventful.API.EventGet
+  onPress: PressableProps['onPress']
+}) => (
   <Card
     shadowProps={{
       style: [s.ass],
     }}
     style={[s.flx_r, s.jcsb]}
+    onPress={onPress}
   >
     <View style={[s.flx_c]}>
       <H5 style={[s.bold]}>{event.name}</H5>
@@ -51,7 +58,9 @@ export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) =
       <Agenda
         items={events}
         noTimeHeader="TBD"
-        renderItem={(event) => <Event event={event} />}
+        renderItem={(event) => (
+          <Event event={event} onPress={() => navigation.push('Event', { event: event._id })} />
+        )}
         renderOnEveryDay={false}
       />
     </View>

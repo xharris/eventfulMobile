@@ -25,18 +25,24 @@ export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
     },
     onSubmit: (values) => {
       isSigningUp
-        ? signUp({ ...values, remember: true }).then(() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Events' }],
+        ? signUp({ ...values, remember: true })
+            .then(() => {
+              console.log('ok good')
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Events' }],
+              })
             })
-          )
-        : logIn({ ...values, remember: true }).then(() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Events' }],
+            .catch(console.log)
+        : logIn({ ...values, remember: true })
+            .then(() => {
+              console.log('ok good')
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Events' }],
+              })
             })
-          )
+            .catch(console.log)
     },
   })
 

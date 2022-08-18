@@ -11,12 +11,15 @@ import {
 import { c, s, HeaderSize, spacing, radius } from '../libs/styles'
 import { Spacer } from './Spacer'
 
+export const getOnButtonColor = (transparent: boolean) => (transparent ? c.oneDark : c.onOneDark)
+
 interface ButtonProps extends PressableProps {
   color?: string
   title?: string
   titleSize?: HeaderSize
   iconRight?: () => ReactNode
   iconLeft?: () => ReactNode
+  transparent?: boolean
 }
 
 export const Button = ({
@@ -27,16 +30,17 @@ export const Button = ({
   iconRight,
   iconLeft,
   disabled,
+  transparent,
   ...props
 }: ButtonProps) => (
   <Pressable
     {...props}
     style={(props) => [
-      typeof style === 'function' ? style(props) : style,
       {
-        backgroundColor: c.oneDark,
+        backgroundColor: transparent ? 'transparent' : c.oneDark,
         borderRadius: radius.normal,
       },
+      typeof style === 'function' ? style(props) : style,
     ]}
     android_ripple={{
       color: c.oneLight,
@@ -61,7 +65,7 @@ export const Button = ({
             style={[
               s[titleSize],
               {
-                color: c.onOneDark,
+                color: transparent ? c.oneDark : c.onOneDark,
                 textDecorationLine: disabled ? 'line-through' : undefined,
                 opacity: disabled ? 0.7 : 1,
               },
@@ -71,6 +75,7 @@ export const Button = ({
           </Text>
         ) : null}
       </View>
+      {iconRight && title ? <Spacer /> : null}
       {iconRight ? iconRight() : null}
     </View>
   </Pressable>

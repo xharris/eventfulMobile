@@ -1,18 +1,28 @@
-import { useEffect, useState } from 'react'
-import { Pressable, Text, TouchableOpacity, View } from 'react-native'
+import { ReactNode, useEffect, useState } from 'react'
+import { Pressable, PressableStateCallbackType, Text, TouchableOpacity, View } from 'react-native'
 import Feather from '@expo/vector-icons/Feather'
 import { H5, H6 } from './Header'
 import { c, radius, s, spacing } from '../libs/styles'
 import { Spacer } from './Spacer'
 
+export const getOnCheckboxColor = (value: boolean) => (value ? c.onTwoDark : c.twoDark)
+
 interface CheckboxProps {
-  label: string
+  label?: string
+  defaultChecked?: boolean
   checked?: boolean
   onChange?: (e: boolean) => void
+  iconRight?: (props: PressableStateCallbackType) => ReactNode
 }
 
-export const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
-  const [value, setValue] = useState(checked)
+export const Checkbox = ({
+  label,
+  checked,
+  defaultChecked,
+  onChange,
+  iconRight,
+}: CheckboxProps) => {
+  const [value, setValue] = useState(defaultChecked ?? checked)
   useEffect(() => {
     if (checked != null) {
       setValue(checked)
@@ -32,7 +42,7 @@ export const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
       }}
       style={[s.asfs]}
     >
-      {({ pressed }) => (
+      {(props) => (
         <View
           style={[
             s.flx_r,
@@ -54,13 +64,16 @@ export const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
             }}
           />
           <Spacer size={spacing.small} />
-          <H6
-            style={{
-              color: value ? c.onTwoDark : c.twoDark,
-            }}
-          >
-            {label}
-          </H6>
+          {label ? (
+            <H6
+              style={{
+                color: value ? c.onTwoDark : c.twoDark,
+              }}
+            >
+              {label}
+            </H6>
+          ) : null}
+          {iconRight ? iconRight(props) : null}
         </View>
       )}
     </Pressable>
