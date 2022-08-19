@@ -1,10 +1,13 @@
-import { FC } from 'react'
-import { TextInputProps } from 'react-native'
-import { c, s, spacing, styled } from '../libs/styles'
+import { ComponentProps, FC } from 'react'
+import { TextInput as PTextInput } from 'react-native-paper'
 
-export const TextInput: FC<TextInputProps> = styled.TextInput({
-  fontSize: s.h4.fontSize,
-  borderColor: c.twoDark,
-  borderBottomWidth: 1,
-  padding: spacing.inputPadding,
-})
+export const TextInput: FC<ComponentProps<typeof PTextInput>> = ({ ...props }) => (
+  <PTextInput {...props} />
+)
+
+// styled.TextInput({
+//   fontSize: s.h4.fontSize,
+//   borderColor: c.twoDark,
+//   borderBottomWidth: 1,
+//   padding: spacing.inputPadding,
+// })

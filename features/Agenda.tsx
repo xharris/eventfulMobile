@@ -259,6 +259,7 @@ export const Agenda = <I extends Item = Item>({
           contentContainerStyle={{
             padding: 4,
           }}
+          // initialScrollIndex
         />
       ) : noItemsText ? (
         <H1 style={{ color: '$disabled', fontStyle: 'italic', textAlign: 'center' }}>

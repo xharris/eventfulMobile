@@ -13,9 +13,9 @@ const range = <K extends string, T>(len: number, cb: (i: number, len: number) =>
 const lerp = (min: number, max: number, pct: number) => min * (1 - pct) + max * pct
 
 export const spacing = {
-  small: 5,
-  normal: 10,
-  container: 15,
+  small: 2, // large (5)
+  normal: 5, // large (10)
+  container: 10, // large (15)
   inputPadding: 8,
   controlPadding: 10,
 }
@@ -57,12 +57,14 @@ export const c = {
   onBg: '#000000',
   onSurf: '#000000',
   onErr: '#FFFFFF',
+  // regular colors
+  red: '#F44336',
 }
 
 export const s = StyleSheet.create({
   ...(range(7, (i) => ({
     [`h${i}`]: {
-      fontSize: lerp(16, 50, (6 - i) / 6),
+      fontSize: lerp(13, 36, (6 - i) / 6), // large (16, 50)
     },
   })) as Record<HeaderSize, TextStyle>),
   flx_r: {
@@ -105,7 +107,11 @@ export const s = StyleSheet.create({
   /** container */
   c: {
     padding: spacing.container,
-    borderRadius: 5,
+    borderRadius: radius.normal,
+  },
+  ctrl: {
+    padding: spacing.controlPadding,
+    borderRadius: radius.normal,
   },
   bold: {
     fontWeight: 'bold',

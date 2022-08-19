@@ -10,7 +10,7 @@ import {
 import { c, radius, s } from '../libs/styles'
 import { Shadow, ShadowProps } from 'react-native-shadow-2'
 
-interface CardProps extends PressableProps {
+export interface CardProps extends PressableProps {
   shadowProps?: ShadowProps
 }
 

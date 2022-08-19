@@ -5,7 +5,7 @@ import { H5, H6 } from './Header'
 import { c, radius, s, spacing } from '../libs/styles'
 import { Spacer } from './Spacer'
 
-export const getOnCheckboxColor = (value: boolean) => (value ? c.onTwoDark : c.twoDark)
+export const getOnCheckboxColor = (value: boolean) => (value ? c.onOneLight : c.onBg)
 
 interface CheckboxProps {
   label?: string
@@ -49,8 +49,8 @@ export const Checkbox = ({
             s.aic,
             {
               padding: spacing.inputPadding,
-              backgroundColor: value ? c.twoDark : 'transparent',
-              borderColor: c.twoDark,
+              backgroundColor: value ? c.oneLight : c.surf,
+              borderColor: value ? c.oneLight : c.surf,
               borderWidth: 1,
               borderRadius: radius.normal,
             },
@@ -59,7 +59,7 @@ export const Checkbox = ({
           <Feather
             name={value ? 'check' : 'x'}
             style={{
-              color: value ? c.onTwoDark : c.twoDark,
+              color: value ? c.onOneLight : c.onSurf,
               fontSize: s.h6.fontSize,
             }}
           />
@@ -67,7 +67,7 @@ export const Checkbox = ({
           {label ? (
             <H6
               style={{
-                color: value ? c.onTwoDark : c.twoDark,
+                color: value ? c.onOneLight : c.onSurf,
               }}
             >
               {label}

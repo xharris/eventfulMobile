@@ -1,10 +1,13 @@
 import { ComponentProps, useMemo } from 'react'
 import { Text, View } from 'react-native'
+import { Eventful } from 'types'
+import { useUser } from '../eventfulLib/user'
 import { c, s, spacing } from '../libs/styles'
 import { H6 } from './Header'
 import { Spacer } from './Spacer'
 
 interface AvatarProps extends ComponentProps<typeof View> {
+  id?: Eventful.ID
   username?: string
   color?: string
   size?: 'small' | 'medium' | 'large'
@@ -12,12 +15,14 @@ interface AvatarProps extends ComponentProps<typeof View> {
 }
 
 export const Avatar = ({
-  username,
+  id,
+  username: _username,
   color = '#CFD8DC',
   size = 'small',
   style,
   ...props
 }: AvatarProps) => {
+  const { data: { username } = { username: _username } } = useUser({ id })
   const sizeDim = useMemo(() => (size === 'small' ? 30 : size === 'medium' ? 40 : 100), [size])
   const fontSize = useMemo(() => (size === 'small' ? 12 : size === 'medium' ? 16 : 32), [size])
   return (
@@ -53,7 +58,7 @@ export const Avatar = ({
 
 interface AvatarGroupProps extends AvatarProps {
   backgroundColor?: string
-  avatars?: Pick<AvatarProps, 'username' | 'color'>[]
+  avatars?: Pick<AvatarProps, 'id' | 'username' | 'color'>[]
   limit?: number
 }
 
@@ -69,7 +74,7 @@ export const AvatarGroup = ({
         <Avatar
           {...props}
           {...avatar}
-          key={avatar.username}
+          key={avatar.id ?? avatar.username ?? a}
           style={{
             marginLeft: -12,
             borderWidth: 1,

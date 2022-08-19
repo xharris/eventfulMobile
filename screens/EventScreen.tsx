@@ -179,12 +179,20 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.StackProps<'Event
           data={items}
           keyExtractor={(item) => item.key}
           contentContainerStyle={{ padding: 4 }}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             if (item.type === 'message') {
               item = item as MessageProps
               return (
-                <View style={[s.flx_1]}>
-                  <Message message={item.data} />
+                <View style={[s.ass, s.ais]}>
+                  <Message
+                    message={item.data}
+                    prevSameUser={
+                      index < items.length - 1 &&
+                      items[index + 1].type === 'message' &&
+                      (items[index + 1] as MessageProps).data.createdBy._id ===
+                        item.data.createdBy._id
+                    }
+                  />
                 </View>
               )
             }
@@ -192,7 +200,10 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.StackProps<'Event
               item = item as PlanProps
               return (
                 <View style={[s.flx_1]}>
-                  <Plan plan={item.data} />
+                  <Plan
+                    plan={item.data}
+                    onPress={() => navigation.push('PlanEditScreen', { plan: item.data._id })}
+                  />
                 </View>
               )
             }

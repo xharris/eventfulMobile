@@ -20,6 +20,7 @@ interface ButtonProps extends PressableProps {
   iconRight?: () => ReactNode
   iconLeft?: () => ReactNode
   transparent?: boolean
+  outlined?: boolean
 }
 
 export const Button = ({
@@ -31,52 +32,66 @@ export const Button = ({
   iconLeft,
   disabled,
   transparent,
+  outlined,
+  children,
   ...props
 }: ButtonProps) => (
   <Pressable
     {...props}
     style={(props) => [
       {
+        borderWidth: outlined ? 1 : 0,
+        borderColor: c.oneDark,
         backgroundColor: transparent ? 'transparent' : c.oneDark,
         borderRadius: radius.normal,
       },
       typeof style === 'function' ? style(props) : style,
     ]}
     android_ripple={{
-      color: c.oneLight,
+      color: c.oneDark,
     }}
     disabled={disabled}
   >
-    <View
-      style={[
-        s.flx_r,
-        s.aic,
-        s.jcsb,
-        {
-          padding: spacing.controlPadding * 1.5,
-        },
-      ]}
-    >
-      <View style={[s.flx_r, s.aic, s.jcsb]}>
-        {iconLeft ? iconLeft() : null}
-        {iconLeft && title ? <Spacer /> : null}
-        {title ? (
-          <Text
-            style={[
-              s[titleSize],
-              {
-                color: transparent ? c.oneDark : c.onOneDark,
-                textDecorationLine: disabled ? 'line-through' : undefined,
-                opacity: disabled ? 0.7 : 1,
-              },
-            ]}
-          >
-            {title}
-          </Text>
-        ) : null}
+    {(props) => (
+      <View
+        style={[
+          s.flx_r,
+          s.aic,
+          s.jcsb,
+          {
+            padding: spacing.controlPadding * 1.5,
+          },
+        ]}
+      >
+        {children ? (
+          typeof children === 'function' ? (
+            children(props)
+          ) : (
+            children
+          )
+        ) : (
+          <View style={[s.flx_r, s.aic, s.jcsb]}>
+            {iconLeft ? iconLeft() : null}
+            {iconLeft && title ? <Spacer /> : null}
+            {title ? (
+              <Text
+                style={[
+                  s[titleSize],
+                  {
+                    color: transparent ? c.oneDark : c.onOneDark,
+                    textDecorationLine: disabled ? 'line-through' : undefined,
+                    opacity: disabled ? 0.7 : 1,
+                  },
+                ]}
+              >
+                {title}
+              </Text>
+            ) : null}
+          </View>
+        )}
+        {iconRight && title ? <Spacer /> : null}
+        {iconRight ? iconRight() : null}
       </View>
-      {iconRight && title ? <Spacer /> : null}
-      {iconRight ? iconRight() : null}
-    </View>
+    )}
   </Pressable>
 )
