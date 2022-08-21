@@ -2,13 +2,14 @@ import Feather from '@expo/vector-icons/Feather'
 import { useFormik } from 'formik'
 import React, { useEffect } from 'react'
 import { View } from 'react-native'
-import { FAB, TouchableRipple } from 'react-native-paper'
+import { ActivityIndicator, FAB, TouchableRipple } from 'react-native-paper'
 import { Eventful } from 'types'
 import { AvatarGroup } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { H5 } from '../components/Header'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
+import { TimeInput } from '../components/TimeInput'
 import { useContacts } from '../eventfulLib/contact'
 import { useEvent } from '../eventfulLib/event'
 import { usePlan } from '../eventfulLib/plan'
@@ -18,7 +19,14 @@ import { ContactSelectEvent } from './ContactSelect'
 
 export const PlanEditScreen = ({ navigation, route }: Eventful.RN.StackProps<'PlanEditScreen'>) => {
   const { plan: planId } = route.params
-  const { data: plan, updatePlan } = usePlan({ plan: planId })
+  const { data: plan, updatePlan, isFetching, isRefetching } = usePlan({ plan: planId })
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'Edit plan',
+    })
+  }, [navigation])
+
   const { errors, setFieldValue, resetForm, values, dirty, submitForm } =
     useFormik<Eventful.API.PlanEdit>({
       initialValues: {
@@ -36,14 +44,16 @@ export const PlanEditScreen = ({ navigation, route }: Eventful.RN.StackProps<'Pl
     })
 
   const { session } = useSession()
-  const { data: contacts } = useContacts({ user: session?._id })
-  const { data: event } = useEvent({ id: plan?.event })
 
   ContactSelectEvent.useListen((users) => {
     setFieldValue('who', users)
   })
 
-  return (
+  return isFetching && !isRefetching ? (
+    <View style={[s.c, s.flx_1]}>
+      <ActivityIndicator size="large" />
+    </View>
+  ) : (
     <View style={[s.c, s.flx_1]}>
       <TextInput
         label="What"
@@ -71,7 +81,16 @@ export const PlanEditScreen = ({ navigation, route }: Eventful.RN.StackProps<'Pl
         <H5 style={{ color: c.oneDark }}>Who</H5>
         <AvatarGroup avatars={values.who?.map((id) => ({ id }))} />
       </Button>
-
+      <Spacer />
+      <TimeInput
+        // label="When"
+        startLabel="Start"
+        endLabel="End"
+        defaultValue={values.time}
+        onChange={(v) => {
+          setFieldValue('time', v)
+        }}
+      />
       {dirty ? (
         <FAB
           style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}

@@ -22,7 +22,7 @@ const Event = ({
     shadowProps={{
       style: [s.ass],
     }}
-    style={[s.flx_r, s.jcsb]}
+    style={[s.flx_r, s.jcsb, s.aic]}
     onPress={onPress}
   >
     <View style={[s.flx_c]}>

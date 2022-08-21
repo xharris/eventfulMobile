@@ -27,7 +27,6 @@ export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
       isSigningUp
         ? signUp({ ...values, remember: true })
             .then(() => {
-              console.log('ok good')
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Events' }],
@@ -36,7 +35,6 @@ export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
             .catch(console.log)
         : logIn({ ...values, remember: true })
             .then(() => {
-              console.log('ok good')
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Events' }],

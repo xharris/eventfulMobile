@@ -1,9 +1,9 @@
 import { ComponentProps, FC } from 'react'
 import { TextInput as PTextInput } from 'react-native-paper'
 
-export const TextInput: FC<ComponentProps<typeof PTextInput>> = ({ ...props }) => (
-  <PTextInput {...props} />
-)
+export type TextInputProps = ComponentProps<typeof PTextInput>
+
+export const TextInput: FC<TextInputProps> = ({ ...props }) => <PTextInput {...props} />
 
 // styled.TextInput({
 //   fontSize: s.h4.fontSize,

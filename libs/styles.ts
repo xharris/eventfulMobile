@@ -64,7 +64,7 @@ export const c = {
 export const s = StyleSheet.create({
   ...(range(7, (i) => ({
     [`h${i}`]: {
-      fontSize: lerp(13, 36, (6 - i) / 6), // large (16, 50)
+      fontSize: lerp(14, 36, (6 - i) / 6), // large (16, 50)
     },
   })) as Record<HeaderSize, TextStyle>),
   flx_r: {
