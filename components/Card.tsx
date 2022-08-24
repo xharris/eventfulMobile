@@ -17,8 +17,8 @@ export interface CardProps extends PressableProps {
 export const Card = ({ style, shadowProps, ...props }: CardProps) => (
   <Shadow
     {...shadowProps}
-    distance={3}
-    offset={[2, 2]}
+    distance={1}
+    offset={[1, 1]}
     startColor={`${c.oneDark}7F`}
     endColor={`${c.oneDark}00`}
     style={[shadowProps?.style, { borderRadius: radius.normal }]}

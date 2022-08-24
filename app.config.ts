@@ -21,6 +21,7 @@ export default {
     supportsTablet: true,
   },
   android: {
+    package: 'com.anonymous.eventfulMobile',
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',

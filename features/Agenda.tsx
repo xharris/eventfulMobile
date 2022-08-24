@@ -236,7 +236,7 @@ export const Agenda = <I extends Item = Item>({
   return (
     <View style={[s.flx_c]}>
       {!!items.length && (
-        <View>
+        <View style={[s.flx_r]}>
           <Checkbox
             checked={options.tbd}
             onChange={(v) => setFieldValue('tbd', v)}

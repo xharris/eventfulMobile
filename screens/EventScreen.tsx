@@ -17,7 +17,6 @@ import { c, s, spacing } from '../libs/styles'
 import { IconButton, Menu } from 'react-native-paper'
 import createStateContext from 'react-use/lib/factory/createStateContext'
 import { CommonActions, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../types'
 
 const [useChatCtx, ChatCtxProvider] = createStateContext<{
   options: { plans: boolean; messages: boolean }
@@ -165,6 +164,7 @@ const MessageList = ({
     <View style={[s.c, s.flx_1]}>
       <View style={[s.flx_r, { paddingHorizontal: s.c.padding }]}>
         <Checkbox
+          label="Messages"
           checked={options.messages}
           iconRight={() => (
             <Feather
@@ -182,6 +182,7 @@ const MessageList = ({
         />
         <Spacer />
         <Checkbox
+          label="Plans"
           checked={options.plans}
           iconRight={() => (
             <Feather

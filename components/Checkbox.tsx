@@ -4,6 +4,7 @@ import Feather from '@expo/vector-icons/Feather'
 import { H5, H6 } from './Header'
 import { c, radius, s, spacing } from '../libs/styles'
 import { Spacer } from './Spacer'
+import { Chip } from 'react-native-paper'
 
 export const getOnCheckboxColor = (value: boolean) => (value ? c.onOneLight : c.onBg)
 
@@ -12,7 +13,7 @@ interface CheckboxProps {
   defaultChecked?: boolean
   checked?: boolean
   onChange?: (e: boolean) => void
-  iconRight?: (props: PressableStateCallbackType) => ReactNode
+  iconRight?: () => ReactNode
 }
 
 export const Checkbox = ({
@@ -30,52 +31,18 @@ export const Checkbox = ({
   }, [checked])
 
   return (
-    <Pressable
+    <Chip
       onPress={() => {
         setValue(!value)
         if (onChange) {
           onChange(!value)
         }
       }}
-      android_ripple={{
-        color: c.twoDark,
-      }}
-      style={[s.asfs]}
+      icon={iconRight} // () => <Feather name={value ? 'check' : 'x'} />}
+      // closeIcon={iconRight}
+      selected={value}
     >
-      {(props) => (
-        <View
-          style={[
-            s.flx_r,
-            s.aic,
-            {
-              padding: spacing.inputPadding,
-              backgroundColor: value ? c.oneLight : c.surf,
-              borderColor: value ? c.oneLight : c.surf,
-              borderWidth: 1,
-              borderRadius: radius.normal,
-            },
-          ]}
-        >
-          <Feather
-            name={value ? 'check' : 'x'}
-            style={{
-              color: value ? c.onOneLight : c.onSurf,
-              fontSize: s.h6.fontSize,
-            }}
-          />
-          <Spacer size={spacing.small} />
-          {label ? (
-            <H6
-              style={{
-                color: value ? c.onOneLight : c.onSurf,
-              }}
-            >
-              {label}
-            </H6>
-          ) : null}
-          {iconRight ? iconRight(props) : null}
-        </View>
-      )}
-    </Pressable>
+      {label}
+    </Chip>
   )
 }

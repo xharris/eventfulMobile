@@ -15,6 +15,7 @@ import { NotificationSettingScreen } from './screens/NotificationSettingScreen'
 import { PlanEditScreen } from './screens/PlanEditScreen'
 import { c } from './libs/styles'
 import { ContactSelectScreen } from './screens/ContactSelect'
+import { StatusBar } from 'expo-status-bar'
 
 const qc = new QueryClient()
 
@@ -62,6 +63,7 @@ export default function App() {
                 <Stack.Screen name="PlanEditScreen" component={PlanEditScreen} />
                 <Stack.Screen name="ContactSelect" component={ContactSelectScreen} />
               </Stack.Navigator>
+              <StatusBar style="dark" />
             </NavigationContainer>
           </SafeAreaProvider>
         </SessionProvider>
