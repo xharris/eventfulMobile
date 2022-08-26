@@ -8,7 +8,7 @@ import { Button } from '../components/Button'
 import { TextInput } from '../components/TextInput'
 import { Spacer } from '../components/Spacer'
 
-export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
+export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Auth'>) => {
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -29,7 +29,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
             .then(() => {
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'Events' }],
+                routes: [{ name: 'App' }],
               })
             })
             .catch(console.log)
@@ -37,7 +37,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.StackProps<'Auth'>) => {
             .then(() => {
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'Events' }],
+                routes: [{ name: 'App' }],
               })
             })
             .catch(console.log)

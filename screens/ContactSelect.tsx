@@ -16,7 +16,7 @@ export const ContactSelectEvent = createEvent<Eventful.ID[]>()
 export const ContactSelectScreen = ({
   navigation,
   route,
-}: Eventful.RN.StackProps<'ContactSelect'>) => {
+}: Eventful.RN.EventStackScreenProps<'ContactSelect'>) => {
   const { user, selected: defaultSelected } = route.params
   const { data } = useContacts({ user })
   const [selected, setSelected] = useState(defaultSelected)
@@ -42,8 +42,9 @@ export const ContactSelectScreen = ({
             <Pressable
               style={[s.flx_r, s.aic]}
               onPress={() =>
-                navigation.push('User', {
-                  user: contact._id,
+                navigation.navigate('UserTab', {
+                  screen: 'User',
+                  params: { user: contact._id },
                 })
               }
             >

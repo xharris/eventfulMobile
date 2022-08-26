@@ -1,4 +1,5 @@
-import { StyleSheet, TextStyle, ViewStyle } from 'react-native'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Animated, Easing, StyleSheet, TextStyle, ViewStyle } from 'react-native'
 export { default as styled } from 'styled-components/native'
 
 const range = <K extends string, T>(len: number, cb: (i: number, len: number) => Record<K, T>) =>
@@ -117,3 +118,35 @@ export const s = StyleSheet.create({
     fontWeight: 'bold',
   },
 })
+
+// WIP
+export const useAnimatedValue = (value: number, toValue: number, duration = 2000) => {
+  const [v, setV] = useState(value)
+  const animatedValue = useRef(new Animated.Value(value)).current
+  const animation = useMemo(
+    () =>
+      Animated.timing(animatedValue, {
+        toValue,
+        duration,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    [animatedValue, toValue, duration]
+  )
+
+  useEffect(() => {
+    animation.start()
+  }, [animation])
+
+  useEffect(() => {
+    animatedValue.addListener(({ value }) => {
+      console.log(value)
+      setV(value)
+    })
+    return () => {
+      animatedValue.removeAllListeners()
+    }
+  }, [animatedValue])
+
+  return v
+}

@@ -1,4 +1,6 @@
-import { DefaultTheme } from '@react-navigation/native'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import { CompositeScreenProps, DefaultTheme } from '@react-navigation/native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
 import { Pressable, PressableProps, Text, View } from 'react-native'
 import { Eventful } from 'types'
@@ -37,7 +39,7 @@ const Event = ({
   </Card>
 )
 
-export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) => {
+export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
   const { session } = useSession()
   const { data: events } = useEvents()
 
@@ -46,7 +48,14 @@ export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) =
       headerLeft: () => null,
       headerTitle: '',
       headerRight: () => (
-        <Pressable onPress={() => navigation.push('User', { user: session?._id })}>
+        <Pressable
+          onPress={() =>
+            navigation.navigate('UserTab', {
+              screen: 'User',
+              params: { user: session?._id },
+            })
+          }
+        >
           <Avatar size="medium" username={session?.username} />
         </Pressable>
       ),
@@ -59,7 +68,18 @@ export const EventsScreen = ({ navigation }: Eventful.RN.StackProps<'Events'>) =
         items={events}
         noTimeHeader="TBD"
         renderItem={(event) => (
-          <Event event={event} onPress={() => navigation.push('Event', { event: event._id })} />
+          <Event
+            event={event}
+            onPress={() =>
+              navigation.navigate('App', {
+                screen: 'EventTab',
+                params: {
+                  screen: 'Event',
+                  params: { event: event._id },
+                },
+              })
+            }
+          />
         )}
         renderOnEveryDay={false}
       />

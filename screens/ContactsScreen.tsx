@@ -9,7 +9,10 @@ import { useContacts } from '../eventfulLib/contact'
 import { AreYouSure } from '../libs/dialog'
 import { c, radius, s, spacing } from '../libs/styles'
 
-export const ContactsScreen = ({ navigation, route }: Eventful.RN.StackProps<'Contacts'>) => {
+export const ContactsScreen = ({
+  navigation,
+  route,
+}: Eventful.RN.UserStackScreenProps<'Contacts'>) => {
   const { user } = route.params
   const { data, removeContact } = useContacts({ user })
 

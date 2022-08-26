@@ -16,7 +16,8 @@ import { Plan } from '../features/Plan'
 import { c, s, spacing } from '../libs/styles'
 import { IconButton, Menu } from 'react-native-paper'
 import createStateContext from 'react-use/lib/factory/createStateContext'
-import { CommonActions, useNavigation } from '@react-navigation/native'
+import { CommonActions, CompositeScreenProps, useNavigation } from '@react-navigation/native'
+import { useStorage } from '../libs/storage'
 
 const [useChatCtx, ChatCtxProvider] = createStateContext<{
   options: { plans: boolean; messages: boolean }
@@ -260,13 +261,9 @@ const MessageList = ({
   )
 }
 
-export const EventScreen = ({ navigation, route }: Eventful.RN.StackProps<'Event'>) => {
+export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenProps<'Event'>) => {
   const { event: eventId } = route.params
   const { data: event, updateEvent } = useEvent({ id: eventId })
-  const [options, setOptions] = useState({
-    plans: true,
-    messages: true,
-  })
   const { session } = useSession()
   const { dirty, handleChange, submitForm } = useFormik<Eventful.API.EventUpdate>({
     initialValues: {
@@ -278,6 +275,12 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.StackProps<'Event
     },
   })
   const [menuVisible, setMenuVisible] = useState(false)
+  const [_, store] = useStorage()
+
+  useEffect(() => {
+    console.log('store', eventId)
+    store({ lastEvent: eventId })
+  }, [eventId])
 
   useEffect(() => {
     navigation.setOptions({
@@ -324,7 +327,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.StackProps<'Event
       <View style={[s.flx_c, s.flx_1]}>
         <MessageList
           event={eventId}
-          onPlanPress={(id) => navigation.push('PlanEditScreen', { plan: id })}
+          onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
         />
         <EventInput event={eventId} />
       </View>

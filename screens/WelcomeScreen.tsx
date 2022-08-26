@@ -5,7 +5,7 @@ import { Button } from '../components/Button'
 import { useSession } from '../eventfulLib/session'
 import { s } from '../libs/styles'
 
-export const WelcomeScreen = ({ navigation }: Eventful.RN.StackProps<'Welcome'>) => {
+export const WelcomeScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Welcome'>) => {
   const { session } = useSession()
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export const WelcomeScreen = ({ navigation }: Eventful.RN.StackProps<'Welcome'>)
 
   useEffect(() => {
     if (session) {
-      navigation.replace('Events')
+      navigation.replace('App', { screen: 'AgendaTab', params: { screen: 'Events' } })
     }
   }, [session])
 

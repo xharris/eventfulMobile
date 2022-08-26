@@ -17,7 +17,10 @@ import { useSession } from '../eventfulLib/session'
 import { c, s, spacing } from '../libs/styles'
 import { ContactSelectEvent } from './ContactSelect'
 
-export const PlanEditScreen = ({ navigation, route }: Eventful.RN.StackProps<'PlanEditScreen'>) => {
+export const PlanEditScreen = ({
+  navigation,
+  route,
+}: Eventful.RN.EventStackScreenProps<'PlanEdit'>) => {
   const { plan: planId } = route.params
   const { data: plan, updatePlan, isFetching, isRefetching } = usePlan({ plan: planId })
 

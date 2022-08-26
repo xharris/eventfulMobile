@@ -1,8 +1,8 @@
+// import 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider, useSession } from './eventfulLib/session'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { EventsScreen } from './screens/EventsScreen'
 import { Eventful } from 'types'
 import { Provider, DefaultTheme as DefaultPaperTheme } from 'react-native-paper'
@@ -13,18 +13,127 @@ import { ContactsScreen } from './screens/ContactsScreen'
 import { EventScreen } from './screens/EventScreen'
 import { NotificationSettingScreen } from './screens/NotificationSettingScreen'
 import { PlanEditScreen } from './screens/PlanEditScreen'
-import { c } from './libs/styles'
+import { c, useAnimatedValue } from './libs/styles'
 import { ContactSelectScreen } from './screens/ContactSelect'
 import { StatusBar } from 'expo-status-bar'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { Animated, View } from 'react-native'
+import { useStorage } from './libs/storage'
+import Feather from '@expo/vector-icons/Feather'
+import { ComponentProps, useRef } from 'react'
 
 const qc = new QueryClient()
 
 const Inner = () => {
   useSession(true)
-  return null
+  return <StatusBar style="dark" />
 }
 
-const Stack = createNativeStackNavigator<Eventful.RN.RootStackParamList>()
+const WelcomeStack = createNativeStackNavigator()
+const AgendaStack = createNativeStackNavigator()
+const EventStack = createNativeStackNavigator()
+const UserStack = createNativeStackNavigator()
+const BottomTabs = createMaterialBottomTabNavigator()
+
+// const DrawerNav = () => (
+
+// )
+
+const TabIcon = ({
+  name,
+  focused,
+  color,
+}: {
+  name: ComponentProps<typeof Feather>['name']
+  focused: boolean
+  color: string
+}) => {
+  // const size = useAnimatedValue(focused ? 14 : 18, focused ? 18 : 14)
+
+  return <Feather style={{ color }} name={name} size={18} />
+}
+
+const AppNav = () => {
+  const [storage, store] = useStorage()
+  const { session } = useSession()
+
+  return (
+    <BottomTabs.Navigator initialRouteName="AgendaTab" shifting={true}>
+      <BottomTabs.Screen
+        name="AgendaTab"
+        options={{
+          title: 'Agenda',
+          tabBarColor: '#1A237E',
+          tabBarIcon: (props) => <TabIcon {...props} name="calendar" />,
+        }}
+      >
+        {() => (
+          <AgendaStack.Navigator>
+            <AgendaStack.Screen name="Events" component={EventsScreen} />
+          </AgendaStack.Navigator>
+        )}
+      </BottomTabs.Screen>
+      <BottomTabs.Screen
+        name="EventTab"
+        options={{
+          title: 'Event',
+          tabBarColor: '#0D47A1',
+          tabBarIcon: (props) => <TabIcon {...props} name="align-left" />,
+        }}
+        listeners={{
+          tabPress: (e) => {
+            if (!storage?.lastEvent) {
+              e.preventDefault()
+            }
+          },
+        }}
+      >
+        {() => (
+          <EventStack.Navigator>
+            <EventStack.Screen
+              name="Event"
+              component={EventScreen}
+              initialParams={{ event: storage?.lastEvent }}
+            />
+            <EventStack.Screen name="PlanEdit" component={PlanEditScreen} />
+            <EventStack.Screen name="ContactSelect" component={ContactSelectScreen} />
+            <EventStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
+          </EventStack.Navigator>
+        )}
+      </BottomTabs.Screen>
+      <BottomTabs.Screen
+        name="UserTab"
+        options={{
+          title: 'User',
+          tabBarColor: '#006064',
+          tabBarIcon: (props) => <TabIcon {...props} name="user" />,
+        }}
+      >
+        {() => (
+          <UserStack.Navigator>
+            <UserStack.Screen
+              name="User"
+              component={UserScreen}
+              initialParams={{ user: session?._id }}
+            />
+            <UserStack.Screen name="Contacts" component={ContactsScreen} />
+          </UserStack.Navigator>
+        )}
+      </BottomTabs.Screen>
+    </BottomTabs.Navigator>
+  )
+}
+
+const Nav = () => {
+  return (
+    <WelcomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <WelcomeStack.Screen name="Welcome" component={WelcomeScreen} />
+      <WelcomeStack.Screen name="Auth" component={AuthScreen} />
+      <WelcomeStack.Screen name="App" component={AppNav} />
+    </WelcomeStack.Navigator>
+  )
+}
 
 export default function App() {
   return (
@@ -47,23 +156,7 @@ export default function App() {
           <Inner />
           <SafeAreaProvider>
             <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{
-                  headerStyle: { backgroundColor: DefaultTheme.colors.background },
-                  headerShadowVisible: false,
-                }}
-              >
-                <Stack.Screen name="Welcome" component={WelcomeScreen} />
-                <Stack.Screen name="Events" component={EventsScreen} />
-                <Stack.Screen name="Auth" component={AuthScreen} />
-                <Stack.Screen name="User" component={UserScreen} />
-                <Stack.Screen name="Contacts" component={ContactsScreen} />
-                <Stack.Screen name="Event" component={EventScreen} />
-                <Stack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
-                <Stack.Screen name="PlanEditScreen" component={PlanEditScreen} />
-                <Stack.Screen name="ContactSelect" component={ContactSelectScreen} />
-              </Stack.Navigator>
-              <StatusBar style="dark" />
+              <Nav />
             </NavigationContainer>
           </SafeAreaProvider>
         </SessionProvider>

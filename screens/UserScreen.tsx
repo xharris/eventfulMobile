@@ -11,8 +11,9 @@ import Feather from '@expo/vector-icons/Feather'
 import { useSession } from '../eventfulLib/session'
 import { useContacts } from '../eventfulLib/contact'
 import { AreYouSure } from '../libs/dialog'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-export const UserScreen = ({ navigation, route }: Eventful.RN.StackProps<'User'>) => {
+export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
   const { user } = route.params
   const { data } = useUser({ id: user })
   const { session } = useSession()
