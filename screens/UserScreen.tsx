@@ -12,6 +12,8 @@ import { useSession } from '../eventfulLib/session'
 import { useContacts } from '../eventfulLib/contact'
 import { AreYouSure } from '../libs/dialog'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { IconButton } from 'react-native-paper'
+import { useNavigationState } from '@react-navigation/native'
 
 export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
   const { user } = route.params
@@ -19,11 +21,20 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
   const { session } = useSession()
   const { data: contacts, addContact, removeContact } = useContacts({ user: session?._id })
 
+  const index = useNavigationState((state) => state.index)
+
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '',
+      headerRight: () =>
+        index === 0 ? (
+          <IconButton
+            icon={(props) => <Feather {...props} name="search" />}
+            onPress={() => navigation.push('UserSearch')}
+          />
+        ) : null,
     })
-  }, [])
+  }, [navigation, index])
 
   const isContact = useMemo(
     () => (user !== session?._id ? contacts?.some((contact) => contact._id === user) : false),

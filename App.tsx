@@ -22,6 +22,7 @@ import { Animated, View } from 'react-native'
 import { useStorage } from './libs/storage'
 import Feather from '@expo/vector-icons/Feather'
 import { ComponentProps, useRef } from 'react'
+import { UserSearchScreen } from './screens/UserSearchScreen'
 
 const qc = new QueryClient()
 
@@ -118,6 +119,11 @@ const AppNav = () => {
               initialParams={{ user: session?._id }}
             />
             <UserStack.Screen name="Contacts" component={ContactsScreen} />
+            <UserStack.Screen
+              name="UserSearch"
+              component={UserSearchScreen}
+              options={{ title: 'Search for people' }}
+            />
           </UserStack.Navigator>
         )}
       </BottomTabs.Screen>

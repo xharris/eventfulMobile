@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
+import { Checkbox } from 'react-native-paper'
 import { Eventful } from 'types'
-import { Checkbox } from '../components/Checkbox'
-import { H3 } from '../components/Header'
+import { H3, H5 } from '../components/Header'
+import { Spacer } from '../components/Spacer'
 import { useNotifications } from '../eventfulLib/notification'
 import { s } from '../libs/styles'
 
@@ -49,16 +50,21 @@ export const NotificationSettingScreen = ({
   return isFetching ? null : (
     <View style={[s.c]}>
       {items.map(({ category, items, ref, refModel }) => (
-        <View key={category}>
+        <View key={category} style={[s.c]}>
+          <H3>{category}</H3>
           {items.map(({ key, label }) => (
-            <Checkbox
+            <Pressable
               key={key}
-              label={label}
-              defaultChecked={isEnabled({ key, ref, refModel })}
-              onChange={(v) =>
-                v ? enable({ key, ref, refModel }) : disable({ key, ref, refModel })
+              style={[s.flx_r, s.aic, s.jcsb]}
+              onPress={() =>
+                isEnabled({ key, ref, refModel })
+                  ? disable({ key, ref, refModel })
+                  : enable({ key, ref, refModel })
               }
-            />
+            >
+              <H5>{label}</H5>
+              <Checkbox status={isEnabled({ key, ref, refModel }) ? 'checked' : 'unchecked'} />
+            </Pressable>
           ))}
         </View>
       ))}

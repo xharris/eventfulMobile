@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Text, View, ViewProps } from 'react-native'
 import { Checkbox } from './Checkbox'
 import { DateTimeInput, DateTimeInputProps } from './DateTimeInput'
@@ -35,6 +35,14 @@ export const TimeInput = ({
   const [value, setValue] = useState(defaultValue)
   const [end, setEnd] = useState<Eventful.TimePart | undefined>(defaultValue?.end)
   const [hasEnd, setHasEnd] = useState(!!defaultValue?.end)
+
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(defaultValue)
+      setEnd(defaultValue?.end)
+      setHasEnd(!!defaultValue?.end)
+    }
+  }, [defaultValue])
 
   const update = useCallback(
     (v: Partial<Eventful.Time> = {}) => {

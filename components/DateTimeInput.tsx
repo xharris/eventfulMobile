@@ -28,12 +28,18 @@ export const DateTimeInput = ({
   ...props
 }: DateTimeInputProps) => {
   const [mode, setMode] = useState<'date' | 'time' | null>(null)
-
   const [date, setDate] = useState(defaultValue?.date ? new Date(defaultValue.date) : null)
   const [time, setTime] = useState(
     defaultValue?.date && !defaultValue.allday ? new Date(defaultValue?.date) : null
   )
   const [allday, setAllday] = useState(defaultValue?.allday)
+
+  useEffect(() => {
+    if (defaultValue) {
+      setDate(new Date(defaultValue.date))
+      setTime(defaultValue?.date && !defaultValue.allday ? new Date(defaultValue?.date) : null)
+    }
+  }, [defaultValue])
 
   const changed = useCallback(
     (_date: string | null, _time: string | null) => {
