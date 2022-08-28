@@ -21,13 +21,43 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Animated, View } from 'react-native'
 import { useStorage } from './libs/storage'
 import Feather from '@expo/vector-icons/Feather'
-import { ComponentProps, useRef } from 'react'
+import { ComponentProps, useEffect, useRef } from 'react'
 import { UserSearchScreen } from './screens/UserSearchScreen'
+import { SnackbarProvider, useSnackbar } from './components/Snackbar'
+import { api } from './eventfulLib/api'
+import ERROR from './eventfulLib/error'
 
 const qc = new QueryClient()
 
 const Inner = () => {
   useSession(true)
+  const { show } = useSnackbar()
+
+  useEffect(() => {
+    const ic = api.interceptors.response.use(
+      (res) => res,
+      (err) => {
+        const code = err.response.status
+        const status = err.response.data ?? err.code
+        console.log(`[API] code=${code} text=${status}`)
+        if (code === 503) {
+          show({
+            text: 'Server unavailable',
+          })
+        } else if (code >= 400 && status) {
+          show({
+            text: status in ERROR ? ERROR[status] : status,
+          })
+        }
+        return Promise.reject(err)
+      }
+    )
+
+    return () => {
+      api.interceptors.response.eject(ic)
+    }
+  }, [])
+
   return <StatusBar style="dark" />
 }
 
@@ -154,17 +184,20 @@ export default function App() {
           surface: c.surf,
           text: c.onBg,
           onSurface: c.onSurf,
+          error: c.err,
         },
       }}
     >
       <QueryClientProvider client={qc}>
         <SessionProvider>
-          <Inner />
-          <SafeAreaProvider>
-            <NavigationContainer>
-              <Nav />
-            </NavigationContainer>
-          </SafeAreaProvider>
+          <SnackbarProvider>
+            <Inner />
+            <SafeAreaProvider>
+              <NavigationContainer>
+                <Nav />
+              </NavigationContainer>
+            </SafeAreaProvider>
+          </SnackbarProvider>
         </SessionProvider>
       </QueryClientProvider>
     </Provider>

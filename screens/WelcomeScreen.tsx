@@ -27,7 +27,7 @@ export const WelcomeScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'
           <Text style={[s.h1]}>Eventful</Text>
           <Text style={[s.h5]}>(You need to log in)</Text>
         </View>
-        <Button title="Log in" onPress={() => navigation.navigate('Auth')} />
+        <Button title="Log in" onPress={() => navigation.navigate('Auth')} mode="outlined" />
       </View>
     </View>
   )

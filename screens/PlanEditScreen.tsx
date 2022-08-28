@@ -3,18 +3,27 @@ import { useNavigationState } from '@react-navigation/native'
 import { useFormik } from 'formik'
 import React, { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
-import { ActivityIndicator, FAB, IconButton, Menu } from 'react-native-paper'
+import {
+  ActivityIndicator,
+  FAB,
+  IconButton,
+  Menu,
+  Portal,
+  TouchableRipple,
+} from 'react-native-paper'
 import { Eventful } from 'types'
 import { AvatarGroup } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { H5 } from '../components/Header'
+import { useSnackbar } from '../components/Snackbar'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
 import { TimeInput } from '../components/TimeInput'
 import { CATEGORY_INFO, usePlan } from '../eventfulLib/plan'
 import { useSession } from '../eventfulLib/session'
+import { AreYouSure } from '../libs/dialog'
 import { CATEGORY_ICON } from '../libs/plan'
-import { c, s } from '../libs/styles'
+import { c, s, spacing } from '../libs/styles'
 import { ContactSelectEvent } from './ContactSelect'
 
 export const PlanEditScreen = ({
@@ -22,8 +31,9 @@ export const PlanEditScreen = ({
   route,
 }: Eventful.RN.EventStackScreenProps<'PlanEdit'>) => {
   const { plan: planId } = route.params
-  const { data: plan, updatePlan, isFetching, isRefetching } = usePlan({ plan: planId })
+  const { data: plan, updatePlan, deletePlan, isFetching, isRefetching } = usePlan({ plan: planId })
   const [menuVisible, setMenuVisible] = useState(false)
+  const { show } = useSnackbar()
 
   const { errors, setFieldValue, resetForm, values, dirty, submitForm } =
     useFormik<Eventful.API.PlanEdit>({
@@ -84,58 +94,78 @@ export const PlanEditScreen = ({
       <ActivityIndicator size="large" />
     </View>
   ) : (
-    <View style={[s.c, s.flx_1]}>
-      {info.fields.what ? (
-        <TextInput
-          label="What"
-          error={!!errors['what']}
-          value={values.what}
-          onChangeText={(v) => setFieldValue('what', v)}
-        />
-      ) : null}
-      <Spacer />
-      {info.fields.location ? (
-        <TextInput
-          label="Where"
-          value={values.location?.address ?? ''}
-          onChangeText={(v) => setFieldValue('location.address', v)}
-        />
-      ) : null}
-      <Spacer />
-      {info.fields.who ? (
+    <Portal.Host>
+      <View style={[s.c, s.flx_1, s.jcsb]}>
+        <View>
+          {info.fields.what ? (
+            <TextInput
+              label="What"
+              error={!!errors['what']}
+              value={values.what}
+              onChangeText={(v) => setFieldValue('what', v)}
+            />
+          ) : null}
+          <Spacer />
+          {info.fields.location ? (
+            <TextInput
+              label="Where"
+              value={values.location?.address ?? ''}
+              onChangeText={(v) => setFieldValue('location.address', v)}
+            />
+          ) : null}
+          <Spacer />
+          {info.fields.who ? (
+            <TouchableRipple
+              onPress={() =>
+                navigation.push('ContactSelect', {
+                  user: session?._id,
+                  selected: values.who ?? [],
+                })
+              }
+            >
+              <View style={[s.flx_r, s.aic, s.jcsb, s.c]}>
+                <H5 style={{ color: c.oneDark }}>Who</H5>
+                <AvatarGroup avatars={values.who?.map((id) => ({ id }))} />
+              </View>
+            </TouchableRipple>
+          ) : null}
+          <Spacer />
+          {info.fields.time ? (
+            <TimeInput
+              // label="When"
+              startLabel="Start"
+              endLabel="End"
+              defaultValue={values.time}
+              onChange={(v) => {
+                setFieldValue('time', v)
+              }}
+            />
+          ) : null}
+          <Portal>
+            {dirty ? (
+              <FAB
+                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+                icon={(props) => <Feather {...props} name="save" />}
+                onPress={submitForm}
+              />
+            ) : null}
+          </Portal>
+        </View>
         <Button
+          icon={() => <Feather name="trash-2" size={s.h5.fontSize} color={c.err} />}
+          title="Delete"
+          color={c.err}
           onPress={() =>
-            navigation.push('ContactSelect', {
-              user: session?._id,
-              selected: values.who ?? [],
+            AreYouSure('Delete plan?', () => {
+              deletePlan(planId)
+              show({
+                text: 'Plan deleted',
+              })
+              navigation.pop()
             })
           }
-          transparent
-          outlined
-        >
-          <H5 style={{ color: c.oneDark }}>Who</H5>
-          <AvatarGroup avatars={values.who?.map((id) => ({ id }))} />
-        </Button>
-      ) : null}
-      <Spacer />
-      {info.fields.time ? (
-        <TimeInput
-          // label="When"
-          startLabel="Start"
-          endLabel="End"
-          defaultValue={values.time}
-          onChange={(v) => {
-            setFieldValue('time', v)
-          }}
         />
-      ) : null}
-      {dirty ? (
-        <FAB
-          style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-          icon={(props) => <Feather {...props} name="save" />}
-          onPress={submitForm}
-        />
-      ) : null}
-    </View>
+      </View>
+    </Portal.Host>
   )
 }

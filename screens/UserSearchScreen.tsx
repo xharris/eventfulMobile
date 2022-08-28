@@ -44,7 +44,7 @@ export const UserSearchScreen = ({
             </Pressable>
             {user._id !== session?._id && !contacts?.some((user2) => user2._id === user._id) ? (
               <Button
-                iconRight={() => <Feather name="x" color={c.onOneDark} size={s.h6.fontSize} />}
+                icon={() => <Feather name="x" color={c.onOneDark} size={s.h6.fontSize} />}
                 onPress={() => addContact(user._id)}
               />
             ) : null}

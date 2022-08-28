@@ -18,7 +18,7 @@ import { useNavigationState } from '@react-navigation/native'
 export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
   const { user } = route.params
   const { data } = useUser({ id: user })
-  const { session } = useSession()
+  const { session, logOut } = useSession()
   const { data: contacts, addContact, removeContact } = useContacts({ user: session?._id })
 
   const index = useNavigationState((state) => state.index)
@@ -48,29 +48,37 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
         <H2>{data?.username}</H2>
       </View>
       {user === session?._id ? (
-        <View style={[s.c, s.jcfs, s.flx_2]}>
+        <View style={[s.flx_c, s.c, s.flx_2, s.jcsb]}>
+          <View style={[s.flx_c]}>
+            <Button
+              mode="outlined"
+              onPress={() => navigation.push('Contacts', { user })}
+              title="Contacts"
+              icon={(props) => <Feather {...props} name="users" />}
+            />
+            <Spacer />
+            <Button
+              mode="outlined"
+              disabled
+              onPress={() => null}
+              title="Settings"
+              icon={(props) => <Feather {...props} name="settings" />}
+            />
+          </View>
           <Button
-            onPress={() => navigation.push('Contacts', { user })}
-            title="Contacts"
-            iconRight={() => (
-              <Feather name="chevron-right" color={c.onOneDark} size={s.h5.fontSize} />
-            )}
-          />
-          <Spacer />
-          <Button
-            disabled
-            onPress={() => null}
-            title="Settings"
-            iconRight={() => (
-              <Feather name="chevron-right" color={c.onOneDark} size={s.h5.fontSize} />
-            )}
+            color={c.err}
+            onPress={() =>
+              AreYouSure('Log out?', () => logOut().then(() => navigation.navigate('Welcome')))
+            }
+            title="Log out"
+            icon={(props) => <Feather {...props} name="log-out" />}
           />
         </View>
       ) : (
         <View style={[s.c, s.flx_2]}>
           <Button
             title={isContact ? 'Remove' : 'Add'}
-            iconLeft={() => <Feather name="x" color={c.onOneDark} size={s.h6.fontSize} />}
+            icon={(props) => <Feather {...props} name="x" />}
             onPress={() =>
               isContact
                 ? AreYouSure('Delete contact?', () => removeContact(user))

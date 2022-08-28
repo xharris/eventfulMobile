@@ -110,6 +110,11 @@ export const s = StyleSheet.create({
     padding: spacing.container,
     borderRadius: radius.normal,
   },
+  surf: {
+    padding: spacing.container,
+    borderRadius: radius.normal,
+    backgroundColor: c.surf,
+  },
   ctrl: {
     padding: spacing.controlPadding,
     borderRadius: radius.normal,

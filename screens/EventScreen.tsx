@@ -14,12 +14,13 @@ import { useSession } from '../eventfulLib/session'
 import { Message } from '../features/Message'
 import { Plan } from '../features/Plan'
 import { c, s, spacing } from '../libs/styles'
-import { FAB, IconButton, Menu, Modal, Portal } from 'react-native-paper'
+import { FAB, IconButton, Menu, Portal } from 'react-native-paper'
 import createStateContext from 'react-use/lib/factory/createStateContext'
 import { CommonActions, CompositeScreenProps, useNavigation } from '@react-navigation/native'
 import { useStorage } from '../libs/storage'
 import { CATEGORY_INFO, usePlans } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
+import { Modal } from '../components/Modal'
 
 const [useChatCtx, ChatCtxProvider] = createStateContext<{
   options: { plans: boolean; messages: boolean }
@@ -51,6 +52,7 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
   const [{ options, editing, replying }, setChatCtx] = useChatCtx()
   const [fabVisible, setFabVisible] = useState(false)
   const { addPlan } = usePlans({ event })
+  const navigation = useNavigation<Eventful.RN.EventStackScreenProps<'Event'>['navigation']>()
 
   const submitMessage = useCallback(() => {
     if (editing) {
@@ -118,8 +120,8 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
           placeholder="Type a message..."
         />
         {!!text.length ? (
-          <Button
-            iconRight={() => <Feather name="send" size={s.h5.fontSize} />}
+          <IconButton
+            icon={() => <Feather name="send" size={s.h5.fontSize} />}
             style={{
               backgroundColor: 'transparent',
             }}
@@ -146,7 +148,10 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
             .map(([key, cat]) => ({
               icon: CATEGORY_ICON[parseInt(key)],
               label: cat.label,
-              onPress: () => addPlan({ category: parseInt(key) }),
+              onPress: () =>
+                addPlan({ category: parseInt(key) }).then((res) =>
+                  navigation.push('PlanEdit', { plan: res.data._id })
+                ),
               small: key !== '0',
             }))}
           onStateChange={({ open }) => setFabVisible(open)}
@@ -319,9 +324,8 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
     navigation.setOptions({
       headerTitle: () => (
         <Button
-          transparent
           title={event?.name}
-          iconRight={() => (
+          icon={() => (
             <Feather
               name="edit-2"
               size={s.h5.fontSize}
@@ -335,9 +339,8 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
         <Menu
           visible={menuVisible}
           anchor={
-            <Button
-              transparent
-              iconLeft={() => <Feather name="menu" size={s.h5.fontSize} />}
+            <IconButton
+              icon={() => <Feather name="menu" size={s.h5.fontSize} />}
               onPress={() => setMenuVisible(true)}
             />
           }
@@ -368,35 +371,24 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
         </Portal.Host>
       </View>
       <Portal>
-        <Modal visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)} style={[s.c]}>
-          <View
-            style={[
-              s.c,
-              s.flx_c,
-              {
-                backgroundColor: c.surf,
-              },
-            ]}
-          >
-            <TextInput
-              label="Event name"
-              value={values.name}
-              onChangeText={(v) => setFieldValue('name', v)}
-            />
+        <Modal visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
+          <TextInput
+            label="Event name"
+            value={values.name}
+            onChangeText={(v) => setFieldValue('name', v)}
+          />
+          <Spacer />
+          <View style={[s.flx_r, s.asfe]}>
+            <Button title="Cancel" onPress={() => setShowTitleEdit(false)} />
             <Spacer />
-            <View style={[s.flx_r, s.asfe]}>
-              <Button title="Cancel" onPress={() => setShowTitleEdit(false)} transparent />
-              <Spacer />
-              <Button
-                title="Save"
-                disabled={!dirty}
-                onPress={() => {
-                  setShowTitleEdit(false)
-                  submitForm()
-                }}
-                transparent
-              />
-            </View>
+            <Button
+              title="Save"
+              disabled={!dirty}
+              onPress={() => {
+                setShowTitleEdit(false)
+                submitForm()
+              }}
+            />
           </View>
         </Modal>
       </Portal>

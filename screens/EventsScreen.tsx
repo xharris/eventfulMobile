@@ -1,12 +1,15 @@
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { CompositeScreenProps, DefaultTheme } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import React, { useEffect } from 'react'
-import { Pressable, PressableProps, Text, View } from 'react-native'
+import Feather from '@expo/vector-icons/Feather'
+import React, { useEffect, useState } from 'react'
+import { Pressable, PressableProps, View } from 'react-native'
+import { FAB, Portal } from 'react-native-paper'
 import { Eventful } from 'types'
 import { Avatar, AvatarGroup } from '../components/Avatar'
+import { Button } from '../components/Button'
 import { Card } from '../components/Card'
-import { H5, H6 } from '../components/Header'
+import { H5 } from '../components/Header'
+import { Modal } from '../components/Modal'
+import { Spacer } from '../components/Spacer'
+import { TextInput } from '../components/TextInput'
 import { Time } from '../components/Time'
 import { useEvents } from '../eventfulLib/event'
 import { useSession } from '../eventfulLib/session'
@@ -41,7 +44,9 @@ const Event = ({
 
 export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
   const { session } = useSession()
-  const { data: events } = useEvents()
+  const { data: events, createEvent } = useEvents()
+  const [addEventModal, showAddEventModal] = useState(false)
+  const [newEventText, setNewEventText] = useState('')
 
   useEffect(() => {
     navigation.setOptions({
@@ -63,26 +68,60 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
   }, [])
 
   return (
-    <View style={[s.c]}>
-      <Agenda
-        items={events}
-        noTimeHeader="TBD"
-        renderItem={(event) => (
-          <Event
-            event={event}
-            onPress={() =>
-              navigation.navigate('App', {
-                screen: 'EventTab',
-                params: {
-                  screen: 'Event',
-                  params: { event: event._id },
-                },
-              })
-            }
+    <Portal.Host>
+      <View style={[s.c]}>
+        <Agenda
+          items={events}
+          noTimeHeader="TBD"
+          renderItem={(event) => (
+            <Event
+              event={event}
+              onPress={() =>
+                navigation.navigate('App', {
+                  screen: 'EventTab',
+                  params: {
+                    screen: 'Event',
+                    params: { event: event._id },
+                  },
+                })
+              }
+            />
+          )}
+          renderOnEveryDay={false}
+        />
+        <Portal>
+          <FAB
+            style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+            icon={(props) => <Feather {...props} name="plus" />}
+            onPress={() => showAddEventModal(true)}
           />
-        )}
-        renderOnEveryDay={false}
-      />
-    </View>
+          <Modal visible={addEventModal} onDismiss={() => showAddEventModal(false)}>
+            <TextInput
+              label="New event name"
+              value={newEventText}
+              onChangeText={(v) => setNewEventText(v)}
+            />
+            <Spacer />
+            <View style={[s.flx_r, s.asfe]}>
+              <Button title="Cancel" onPress={() => showAddEventModal(false)} />
+              <Spacer />
+              <Button
+                title="Create"
+                disabled={!newEventText.length}
+                onPress={() => {
+                  showAddEventModal(false)
+                  createEvent({ name: newEventText }).then((res) =>
+                    navigation.navigate('EventTab', {
+                      screen: 'Event',
+                      params: { event: res.data._id },
+                    })
+                  )
+                }}
+              />
+            </View>
+          </Modal>
+        </Portal>
+      </View>
+    </Portal.Host>
   )
 }

@@ -37,7 +37,7 @@ export const ContactsScreen = ({
             <H5>{contact.username}</H5>
           </Pressable>
           <Button
-            iconRight={() => <Feather name="x" color={c.onOneDark} size={s.h6.fontSize} />}
+            icon={() => <Feather name="x" color={c.onOneDark} size={s.h6.fontSize} />}
             onPress={() => AreYouSure('Delete contact?', () => removeContact(contact._id))}
           />
         </View>

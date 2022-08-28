@@ -26,21 +26,25 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
     onSubmit: (values) => {
       isSigningUp
         ? signUp({ ...values, remember: true })
-            .then(() => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'App' }],
-              })
+            .then((res) => {
+              if (res && res.status < 300) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'App' }],
+                })
+              }
             })
-            .catch(console.log)
+            .catch(() => null)
         : logIn({ ...values, remember: true })
-            .then(() => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'App' }],
-              })
+            .then((res) => {
+              if (res && res.status < 300) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'App' }],
+                })
+              }
             })
-            .catch(console.log)
+            .catch(() => null)
     },
   })
 
@@ -101,9 +105,12 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
         )}
       </View>
       <View style={[s.flx_c, s.jcsa]}>
-        <Button title={isSigningUp ? 'Sign up' : 'Log in'} onPress={submitForm} />
+        <Button title={isSigningUp ? 'Sign up' : 'Log in'} onPress={submitForm} mode="contained" />
         <Spacer size={30} />
-        <Button title={!isSigningUp ? 'Sign up instead' : 'Log in instead'} onPress={submitForm} />
+        <Button
+          title={!isSigningUp ? 'Sign up instead' : 'Log in instead'}
+          onPress={() => setIsSigningUp(!isSigningUp)}
+        />
       </View>
     </View>
   )
