@@ -7,13 +7,13 @@ interface TimeProps extends ComponentProps<typeof H6> {
   time: Eventful.Time
 }
 
-const calenarFormat = {
+const calendarFormat = {
   lastDay: '[Yesterday]',
   sameDay: '[Today]',
   nextDay: '[Tomorrow]',
   lastWeek: '[last] dddd',
   nextWeek: 'dddd',
-  sameElse: 'LT',
+  sameElse: 'L',
 }
 const calendarFormatTime = {
   lastDay: '[Yesterday at] LT',
@@ -21,7 +21,7 @@ const calendarFormatTime = {
   nextDay: '[Tomorrow at] LT',
   lastWeek: '[last] dddd [at] LT',
   nextWeek: 'dddd [at] LT',
-  sameElse: 'L',
+  sameElse: 'LT',
 }
 
 export const Time = ({ time, ...props }: TimeProps) => {
@@ -30,8 +30,8 @@ export const Time = ({ time, ...props }: TimeProps) => {
     const end = time.end ? moment(time.end.date) : null
 
     return [
-      start?.calendar(time.start?.allday ? calenarFormat : calendarFormatTime),
-      end?.calendar(time.end?.allday ? calenarFormat : calendarFormatTime),
+      start?.calendar(time.start?.allday ? calendarFormat : calendarFormatTime),
+      end?.calendar(time.end?.allday ? calendarFormat : calendarFormatTime),
     ]
       .filter((t) => t)
       .join(' - ')

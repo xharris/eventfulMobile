@@ -1,12 +1,13 @@
 import { useFormik } from 'formik'
 import moment from 'moment'
-import { ReactNode, useEffect, useMemo } from 'react'
+import React, { ReactNode, useEffect, useMemo } from 'react'
 import { Checkbox } from '../components/Checkbox'
 import { SectionList, View, Text } from 'react-native'
 import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
 import { c, s, spacing } from '../libs/styles'
 import { Spacer } from '../components/Spacer'
+import { Headline, Subheading, Title } from 'react-native-paper'
 
 // TODO: show past days with less opacity
 
@@ -91,7 +92,16 @@ interface DayProps<I extends Item> {
 
 const Day = <I extends Item = Item>({ label, items, renderItem }: DayProps<I>) => (
   <View style={[s.flx_r]}>
-    <H4 style={{ minWidth: 26, marginTop: 6, opacity: 0.3 }}>{label}</H4>
+    <Headline
+      style={{
+        minWidth: 50,
+        marginTop: 12,
+        opacity: 0.3,
+        textAlign: 'center',
+      }}
+    >
+      {label}
+    </Headline>
     <Spacer size={spacing.normal} />
     <View style={[s.flx_c, s.flx_1]}>
       {items.map((item) => (
@@ -116,6 +126,8 @@ interface AgendaProps<I extends Item> {
   renderItem: (item: I) => ReactNode
   renderOnEveryDay?: boolean
   showYearSeparator?: boolean
+  onRefresh?: () => void
+  refreshing?: boolean
 }
 
 export const Agenda = <I extends Item = Item>({
@@ -126,6 +138,8 @@ export const Agenda = <I extends Item = Item>({
   renderItem,
   showYearSeparator = true,
   renderOnEveryDay = true,
+  onRefresh,
+  refreshing,
 }: AgendaProps<I>) => {
   const {
     values: options,
@@ -252,13 +266,15 @@ export const Agenda = <I extends Item = Item>({
             <Day<I> label={item.day} items={item.items} renderItem={renderItem} />
           )}
           renderSectionHeader={({ section }) => (
-            <H4 style={[s.c, { opacity: 0.5 }]}>{section.title}</H4>
+            <Title style={[s.c, { opacity: 0.5 }]}>{section.title}</Title>
           )}
           // SectionSeparatorComponent={() => <H5>hi</H5>}
           stickySectionHeadersEnabled
           contentContainerStyle={{
             padding: 4,
           }}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           // initialScrollIndex
         />
       ) : noItemsText ? (

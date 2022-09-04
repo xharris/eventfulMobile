@@ -173,22 +173,22 @@ const Nav = () => {
 
 export default function App() {
   return (
-    <Provider
-      theme={{
-        ...DefaultPaperTheme,
-        colors: {
-          ...DefaultPaperTheme.colors,
-          primary: c.oneDark,
-          accent: c.twoDark,
-          background: c.bg,
-          surface: c.surf,
-          text: c.onBg,
-          onSurface: c.onSurf,
-          error: c.err,
-        },
-      }}
-    >
-      <QueryClientProvider client={qc}>
+    <QueryClientProvider client={qc}>
+      <Provider
+        theme={{
+          ...DefaultPaperTheme,
+          colors: {
+            ...DefaultPaperTheme.colors,
+            primary: c.oneDark,
+            accent: c.twoDark,
+            background: c.bg,
+            surface: c.surf,
+            text: c.onBg,
+            onSurface: c.onSurf,
+            error: c.err,
+          },
+        }}
+      >
         <SessionProvider>
           <SnackbarProvider>
             <Inner />
@@ -199,7 +199,7 @@ export default function App() {
             </SafeAreaProvider>
           </SnackbarProvider>
         </SessionProvider>
-      </QueryClientProvider>
-    </Provider>
+      </Provider>
+    </QueryClientProvider>
   )
 }

@@ -1,5 +1,6 @@
 import { FC } from 'react'
-import { Text, TextProps } from 'react-native'
+import { TextProps } from 'react-native'
+import { Text } from 'react-native-paper'
 import { s } from '../libs/styles'
 
 export const H1: FC<TextProps> = ({ style, ...props }) => <Text {...props} style={[style, s.h1]} />

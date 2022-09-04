@@ -30,5 +30,10 @@ export default {
   web: {
     favicon: './assets/images/favicon.png',
   },
-  extra: process.env,
+  extra: {
+    ...process.env,
+    eas: {
+      projectId: '0467164a-4fcc-403e-9dd5-f3256883917b',
+    },
+  },
 }

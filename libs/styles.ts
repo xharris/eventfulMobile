@@ -145,7 +145,6 @@ export const useAnimatedValue = (value: number, toValue: number, duration = 2000
 
   useEffect(() => {
     animatedValue.addListener(({ value }) => {
-      console.log(value)
       setV(value)
     })
     return () => {

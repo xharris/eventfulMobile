@@ -16,7 +16,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
   }, [])
 
   const [isSigningUp, setIsSigningUp] = useState(false)
-  const { logIn, signUp } = useSession()
+  const { isFetching, logIn, signUp } = useSession()
   const { values, handleChange, submitForm } = useFormik({
     initialValues: {
       username: '',
@@ -105,7 +105,13 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
         )}
       </View>
       <View style={[s.flx_c, s.jcsa]}>
-        <Button title={isSigningUp ? 'Sign up' : 'Log in'} onPress={submitForm} mode="contained" />
+        <Button
+          title={isSigningUp ? 'Sign up' : 'Log in'}
+          onPress={submitForm}
+          mode="contained"
+          loading={isFetching}
+          disabled={isFetching}
+        />
         <Spacer size={30} />
         <Button
           title={!isSigningUp ? 'Sign up instead' : 'Log in instead'}

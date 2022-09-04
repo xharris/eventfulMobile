@@ -36,14 +36,6 @@ export const TimeInput = ({
   const [end, setEnd] = useState<Eventful.TimePart | undefined>(defaultValue?.end)
   const [hasEnd, setHasEnd] = useState(!!defaultValue?.end)
 
-  useEffect(() => {
-    if (defaultValue) {
-      setValue(defaultValue)
-      setEnd(defaultValue?.end)
-      setHasEnd(!!defaultValue?.end)
-    }
-  }, [defaultValue])
-
   const update = useCallback(
     (v: Partial<Eventful.Time> = {}) => {
       let newValue: Eventful.Time = { ...value, ...v }

@@ -12,8 +12,6 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker'
 import { Caption } from 'react-native-paper'
 
-type DateTimePickerOptions = Parameters<typeof DateTimePickerAndroid['open']>[0]
-
 export interface DateTimeInputProps extends ViewProps {
   defaultValue?: Eventful.TimePart
   onChange: (v: Eventful.TimePart | null) => void
@@ -42,16 +40,22 @@ export const DateTimeInput = ({
   }, [defaultValue])
 
   const changed = useCallback(
-    (_date: string | null, _time: string | null) => {
+    (_date: Date | null, _time: Date | null) => {
       if (onChange) {
         setAllday(!_time)
         if (_time && !_date) {
-          _date = moment(moment.now()).format('YYYY-MM-DD')
+          _date = new Date()
         }
         onChange(
           _date
             ? {
-                date: moment([_date, _time ?? ''].join(' '), 'YYYY-MM-DD HH:mm').toDate(),
+                date: moment(
+                  [
+                    moment(_date).format('YYYY-MM-DD'),
+                    _time ? moment(_time).format('HH:mm') : '',
+                  ].join(' '),
+                  'YYYY-MM-DD HH:mm'
+                ).toDate(),
                 allday: !_time,
               }
             : null
@@ -75,16 +79,36 @@ export const DateTimeInput = ({
       setMode(null)
       const cleared = e.type === 'neutralButtonPressed'
       if (v && e.type !== 'dismissed') {
-        if (mode === 'date' || !date) {
-          setDate(cleared ? null : v)
+        if (cleared) {
+          // date -> rem date, rem time
+          if (mode === 'date') {
+            setDate(null)
+            setTime(null)
+            changed(null, null)
+          }
+          // time -> rem time
+          if (mode === 'time') {
+            setTime(null)
+            changed(date, null)
+          }
+        } else {
+          // date = date
+          // date + time = date + time
+          // time = date + time
+          if (mode === 'date') {
+            setDate(v)
+          }
+          if (mode === 'time') {
+            if (!date) {
+              setDate(v)
+            }
+            setTime(v)
+          }
+          changed(
+            mode === 'date' || (mode === 'time' && !date) ? v : date,
+            mode === 'time' ? v : time
+          )
         }
-        if (mode === 'time') {
-          setTime(cleared ? null : v)
-        }
-        changed(
-          cleared ? null : moment(mode === 'date' || !date ? v : date).format('YYYY-MM-DD'),
-          cleared ? null : moment(mode === 'time' ? v : time).format('HH:mm')
-        )
       }
     },
     [mode, changed]

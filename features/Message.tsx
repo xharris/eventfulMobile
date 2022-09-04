@@ -52,7 +52,7 @@ export const Message = ({ message, prevSameUser, ...props }: MessageProps) => {
           }}
         />
         <Spacer />
-        <H5>{message.text}</H5>
+        <H5 textBreakStrategy="balanced">{message.text}</H5>
       </Pressable>
     </View>
   )

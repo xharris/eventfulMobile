@@ -21,37 +21,15 @@ import { useStorage } from '../libs/storage'
 import { CATEGORY_INFO, usePlans } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
 import { Modal } from '../components/Modal'
-
-const [useChatCtx, ChatCtxProvider] = createStateContext<{
-  options: { plans: boolean; messages: boolean }
-  editing?: Eventful.API.MessageGet
-  replying?: Eventful.API.MessageGet
-}>({
-  options: { plans: true, messages: true },
-  editing: undefined,
-  replying: undefined,
-})
-
-type MessageProps = {
-  type: 'message'
-  key: string
-  data: Eventful.API.MessageGet
-}
-
-interface PlanProps {
-  type: 'plan'
-  key: string
-  data: Eventful.API.PlanGet
-}
-
-type Item = MessageProps | PlanProps
+import { AreYouSure } from '../libs/dialog'
+import { MessageList } from '../features/MessageList'
+import { PlanList } from '../features/PlanList'
+import { ChatCtxProvider, useChatCtx } from '../features/ChatCtx'
 
 const EventInput = ({ event }: { event: Eventful.ID }) => {
   const [text, setText] = useState('')
   const { addMessage, updateMessage } = useMessages({ event })
   const [{ options, editing, replying }, setChatCtx] = useChatCtx()
-  const [fabVisible, setFabVisible] = useState(false)
-  const { addPlan } = usePlans({ event })
   const navigation = useNavigation<Eventful.RN.EventStackScreenProps<'Event'>['navigation']>()
 
   const submitMessage = useCallback(() => {
@@ -132,176 +110,13 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
           />
         ) : null}
       </View>
-      <Portal>
-        <FAB.Group
-          style={{
-            paddingBottom: 50,
-            paddingRight: 20,
-          }}
-          visible={!editing && !replying}
-          open={fabVisible}
-          icon={(props) =>
-            fabVisible ? <Feather name="x" {...props} /> : <Feather name="plus" {...props} />
-          }
-          actions={Object.entries(CATEGORY_INFO)
-            .reverse()
-            .map(([key, cat]) => ({
-              icon: CATEGORY_ICON[parseInt(key)],
-              label: cat.label,
-              onPress: () =>
-                addPlan({ category: parseInt(key) }).then((res) =>
-                  navigation.push('PlanEdit', { plan: res.data._id })
-                ),
-              small: key !== '0',
-            }))}
-          onStateChange={({ open }) => setFabVisible(open)}
-          onPress={() => setFabVisible(!fabVisible)}
-        />
-      </Portal>
-    </View>
-  )
-}
-
-const MessageList = ({
-  event: eventId,
-  onPlanPress,
-}: {
-  event?: Eventful.ID
-  onPlanPress: (id: Eventful.ID) => void
-}) => {
-  const navigation = useNavigation()
-  const { data: messages } = useMessages({ event: eventId })
-  const [{ options, editing, replying }, setChatCtx] = useChatCtx()
-  const { data: event } = useEvent({ id: eventId })
-  const { session } = useSession()
-
-  const items = useMemo(
-    () =>
-      [
-        ...(options.plans && event
-          ? event?.plans.map((data) => ({
-              type: 'plan',
-              key: data._id,
-              data,
-            }))
-          : []),
-        ...(options.messages && messages
-          ? messages?.map((data) => ({
-              type: 'message',
-              key: data._id,
-              data,
-            }))
-          : []),
-      ].sort((a, b) => new Date(b.data.createdAt).valueOf() - new Date(a.data.createdAt).valueOf()),
-    [event, messages, options]
-  )
-
-  const [messageMenuVisible, setMessageMenuVisible] = useState<string>('')
-
-  return (
-    <View style={[s.c, s.flx_1]}>
-      <View style={[s.flx_r, { paddingHorizontal: s.c.padding }]}>
-        <Checkbox
-          label="Messages"
-          checked={options.messages}
-          iconRight={() => (
-            <Feather
-              name="message-circle"
-              size={s.h6.fontSize}
-              color={getOnCheckboxColor(options.messages)}
-            />
-          )}
-          onChange={(v) =>
-            setChatCtx((prev) => ({
-              ...prev,
-              options: { ...prev.options, messages: !prev.options.messages },
-            }))
-          }
-        />
-        <Spacer />
-        <Checkbox
-          label="Plans"
-          checked={options.plans}
-          iconRight={() => (
-            <Feather
-              name="calendar"
-              size={s.h6.fontSize}
-              color={getOnCheckboxColor(options.plans)}
-            />
-          )}
-          onChange={(v) =>
-            setChatCtx((prev) => ({
-              ...prev,
-              options: { ...prev.options, plans: !prev.options.plans },
-            }))
-          }
-        />
-      </View>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.key}
-        contentContainerStyle={{ padding: 4 }}
-        renderItem={({ item: _item, index }) => {
-          if (_item.type === 'message') {
-            const item = _item as MessageProps
-            return (
-              <Menu
-                visible={messageMenuVisible === item.key}
-                anchor={
-                  <View style={[s.ass, s.ais]}>
-                    <Message
-                      message={item.data}
-                      prevSameUser={
-                        index < items.length - 1 &&
-                        items[index + 1].type === 'message' &&
-                        (items[index + 1] as MessageProps).data.createdBy._id ===
-                          item.data.createdBy._id
-                      }
-                      delayLongPress={100}
-                      onLongPress={() => setMessageMenuVisible(item.key)}
-                    />
-                  </View>
-                }
-                onDismiss={() => setMessageMenuVisible('')}
-              >
-                {session?._id === item.data.createdBy._id ? (
-                  <Menu.Item
-                    title="Edit"
-                    onPress={() => {
-                      setChatCtx((prev) => ({ ...prev, editing: item.data }))
-                      setMessageMenuVisible('')
-                    }}
-                  />
-                ) : null}
-                <Menu.Item
-                  title="Reply"
-                  onPress={() => {
-                    setChatCtx((prev) => ({ ...prev, replying: item.data }))
-                    setMessageMenuVisible('')
-                  }}
-                />
-              </Menu>
-            )
-          }
-          if (_item.type === 'plan') {
-            const item = _item as PlanProps
-            return (
-              <View style={[s.flx_1]}>
-                <Plan plan={item.data} onPress={() => onPlanPress(item.data._id)} />
-              </View>
-            )
-          }
-          return null
-        }}
-        inverted
-      />
     </View>
   )
 }
 
 export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenProps<'Event'>) => {
   const { event: eventId } = route.params
-  const { data: event, updateEvent } = useEvent({ id: eventId })
+  const { data: event, updateEvent, deleteEvent } = useEvent({ id: eventId })
   const { session } = useSession()
   const { dirty, setFieldValue, values, submitForm } = useFormik<Eventful.API.EventUpdate>({
     initialValues: {
@@ -315,6 +130,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   const [menuVisible, setMenuVisible] = useState(false)
   const [_, store] = useStorage()
   const [showTitleEdit, setShowTitleEdit] = useState(false)
+  const { addPlan } = usePlans({ event: eventId })
 
   useEffect(() => {
     store({ lastEvent: eventId })
@@ -354,6 +170,16 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
               navigation.push('NotificationSetting', { type: 'events', id: eventId })
             }}
           />
+          <Menu.Item
+            icon={({ size, color }) => <Feather name="trash-2" size={size} color={c.err} />}
+            title="Delete"
+            onPress={() => {
+              setMenuVisible(false)
+              AreYouSure('Delete event?', () => {
+                deleteEvent().then(() => navigation.goBack())
+              })
+            }}
+          />
         </Menu>
       ),
     })
@@ -362,36 +188,36 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   return (
     <ChatCtxProvider>
       <View style={[s.flx_c, s.flx_1]}>
-        <Portal.Host>
-          <MessageList
-            event={eventId}
-            onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
-          />
-          <EventInput event={eventId} />
-        </Portal.Host>
+        <PlanList
+          event={eventId}
+          onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
+          onPlanAdd={(body) =>
+            addPlan(body).then((res) => navigation.push('PlanEdit', { plan: res.data._id }))
+          }
+        />
+        <MessageList event={eventId} style={[s.flx_1]} />
+        <EventInput event={eventId} />
       </View>
-      <Portal>
-        <Modal visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
-          <TextInput
-            label="Event name"
-            value={values.name}
-            onChangeText={(v) => setFieldValue('name', v)}
-          />
+      <Modal visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
+        <TextInput
+          label="Event name"
+          value={values.name}
+          onChangeText={(v) => setFieldValue('name', v)}
+        />
+        <Spacer />
+        <View style={[s.flx_r, s.asfe]}>
+          <Button title="Cancel" onPress={() => setShowTitleEdit(false)} />
           <Spacer />
-          <View style={[s.flx_r, s.asfe]}>
-            <Button title="Cancel" onPress={() => setShowTitleEdit(false)} />
-            <Spacer />
-            <Button
-              title="Save"
-              disabled={!dirty}
-              onPress={() => {
-                setShowTitleEdit(false)
-                submitForm()
-              }}
-            />
-          </View>
-        </Modal>
-      </Portal>
+          <Button
+            title="Save"
+            disabled={!dirty}
+            onPress={() => {
+              setShowTitleEdit(false)
+              submitForm()
+            }}
+          />
+        </View>
+      </Modal>
     </ChatCtxProvider>
   )
 }

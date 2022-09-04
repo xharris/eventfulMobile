@@ -10,3 +10,21 @@
 
 - all plan locations as pins on map
 - expense tracking (could be plan type)
+
+# Build android
+
+```
+keytool -genkeypair -v -keystore upload.keystore -alias eventful -keyalg RSA -keysize 2048 -validity 10000
+yarn turtle setup:android
+yarn turtle build:android --keystore-path upload.keystore --keystore-alias eventful
+```
+
+OR 
+
+```
+yarn eas build -p android --profile development
+```
+
+download artifact from https://expo.dev
+
+`adb install app-relase.apk`

@@ -44,7 +44,7 @@ const Event = ({
 
 export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
   const { session } = useSession()
-  const { data: events, createEvent } = useEvents()
+  const { data: events, createEvent, refetch, isRefetching } = useEvents()
   const [addEventModal, showAddEventModal] = useState(false)
   const [newEventText, setNewEventText] = useState('')
 
@@ -88,6 +88,8 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
             />
           )}
           renderOnEveryDay={false}
+          refreshing={isRefetching}
+          onRefresh={() => refetch()}
         />
         <Portal>
           <FAB
@@ -95,32 +97,32 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
             icon={(props) => <Feather {...props} name="plus" />}
             onPress={() => showAddEventModal(true)}
           />
-          <Modal visible={addEventModal} onDismiss={() => showAddEventModal(false)}>
-            <TextInput
-              label="New event name"
-              value={newEventText}
-              onChangeText={(v) => setNewEventText(v)}
-            />
-            <Spacer />
-            <View style={[s.flx_r, s.asfe]}>
-              <Button title="Cancel" onPress={() => showAddEventModal(false)} />
-              <Spacer />
-              <Button
-                title="Create"
-                disabled={!newEventText.length}
-                onPress={() => {
-                  showAddEventModal(false)
-                  createEvent({ name: newEventText }).then((res) =>
-                    navigation.navigate('EventTab', {
-                      screen: 'Event',
-                      params: { event: res.data._id },
-                    })
-                  )
-                }}
-              />
-            </View>
-          </Modal>
         </Portal>
+        <Modal visible={addEventModal} onDismiss={() => showAddEventModal(false)}>
+          <TextInput
+            label="New event name"
+            value={newEventText}
+            onChangeText={(v) => setNewEventText(v)}
+          />
+          <Spacer />
+          <View style={[s.flx_r, s.asfe]}>
+            <Button title="Cancel" onPress={() => showAddEventModal(false)} />
+            <Spacer />
+            <Button
+              title="Create"
+              disabled={!newEventText.length}
+              onPress={() => {
+                showAddEventModal(false)
+                createEvent({ name: newEventText }).then((res) =>
+                  navigation.navigate('EventTab', {
+                    screen: 'Event',
+                    params: { event: res.data._id },
+                  })
+                )
+              }}
+            />
+          </View>
+        </Modal>
       </View>
     </Portal.Host>
   )
