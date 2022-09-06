@@ -1,4 +1,4 @@
-package com.anonymous.eventfulMobile.newarchitecture.modules;
+package com.xhh.eventfulMobile.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

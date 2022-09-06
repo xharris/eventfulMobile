@@ -1,4 +1,4 @@
-package com.anonymous.eventfulMobile.newarchitecture;
+package com.xhh.eventfulMobile.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -20,9 +20,9 @@ import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.anonymous.eventfulMobile.BuildConfig;
-import com.anonymous.eventfulMobile.newarchitecture.components.MainComponentsRegistry;
-import com.anonymous.eventfulMobile.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.xhh.eventfulMobile.BuildConfig;
+import com.xhh.eventfulMobile.newarchitecture.components.MainComponentsRegistry;
+import com.xhh.eventfulMobile.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -19,9 +19,18 @@ export default {
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
+    useFrameworks: 'static',
+    // googleServicesFile: './GoogleService-Info.plist',
+    // infoPlist: {
+    //   UIBackgroundModes: [
+    //     "fetch",
+    //     "remote-notification"
+    //   ]
+    // }
   },
   android: {
-    package: 'com.anonymous.eventfulMobile',
+    package: 'com.xhh.eventfulMobile',
+    googleServicesFile: './google-services.json',
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
@@ -36,4 +45,8 @@ export default {
       projectId: '0467164a-4fcc-403e-9dd5-f3256883917b',
     },
   },
+  plugins: [
+    '@react-native-firebase/app',
+    // '@react-native-firebase/messaging'
+  ],
 }
