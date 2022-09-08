@@ -1,8 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
-import { useNavigationState } from '@react-navigation/native'
 import { useFormik } from 'formik'
 import React, { useEffect, useMemo, useState } from 'react'
-import { View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import {
   ActivityIndicator,
   FAB,
@@ -96,61 +95,72 @@ export const PlanEditScreen = ({
   ) : (
     <Portal.Host>
       <View style={[s.c, s.flx_1, s.jcsb]}>
-        <View>
-          {info.fields.what ? (
-            <TextInput
-              label="What"
-              error={!!errors['what']}
-              value={values.what}
-              onChangeText={(v) => setFieldValue('what', v)}
-            />
-          ) : null}
-          <Spacer />
-          {info.fields.location ? (
-            <TextInput
-              label="Where"
-              value={values.location?.address ?? ''}
-              onChangeText={(v) => setFieldValue('location.address', v)}
-            />
-          ) : null}
-          <Spacer />
-          {info.fields.who ? (
-            <TouchableRipple
-              onPress={() =>
-                navigation.push('ContactSelect', {
-                  user: session?._id,
-                  selected: values.who ?? [],
-                })
-              }
-            >
-              <View style={[s.flx_r, s.aic, s.jcsb, s.c]}>
-                <H5 style={{ color: c.oneDark }}>Who</H5>
-                <AvatarGroup avatars={values.who?.map((id) => ({ id }))} />
-              </View>
-            </TouchableRipple>
-          ) : null}
-          <Spacer />
-          {info.fields.time ? (
-            <TimeInput
-              // label="When"
-              startLabel="Start"
-              endLabel="End"
-              defaultValue={values.time}
-              onChange={(v) => {
-                setFieldValue('time', v)
-              }}
-            />
-          ) : null}
-          <Portal>
-            {dirty ? (
-              <FAB
-                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-                icon={(props) => <Feather {...props} name="save" />}
-                onPress={submitForm}
+        <KeyboardAvoidingView
+          behavior="position"
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+        >
+          <ScrollView>
+            {info.fields.what ? (
+              <TextInput
+                label="What"
+                error={!!errors['what']}
+                value={values.what}
+                onChangeText={(v) => setFieldValue('what', v)}
               />
             ) : null}
-          </Portal>
-        </View>
+            <Spacer />
+            {info.fields.location ? (
+              <TextInput
+                label="Where"
+                value={values.location?.address ?? ''}
+                onChangeText={(v) => setFieldValue('location.address', v)}
+              />
+            ) : null}
+            <Spacer />
+            {info.fields.who ? (
+              <TouchableRipple
+                onPress={() =>
+                  navigation.push('ContactSelect', {
+                    user: session?._id,
+                    selected: values.who ?? [],
+                  })
+                }
+              >
+                <View style={[s.flx_r, s.aic, s.jcsb, s.c]}>
+                  <H5 style={{ color: c.oneDark }}>Who</H5>
+                  <AvatarGroup avatars={values.who?.map((id) => ({ id }))} />
+                </View>
+              </TouchableRipple>
+            ) : null}
+            <Spacer />
+            {info.fields.time ? (
+              <TimeInput
+                // label="When"
+                startLabel="Start"
+                endLabel="End"
+                defaultValue={values.time}
+                onChange={(v) => {
+                  setFieldValue('time', v)
+                }}
+              />
+            ) : null}
+            <TextInput
+              label="Note"
+              value={values.note ?? ''}
+              onChangeText={(v) => setFieldValue('note', v)}
+              multiline
+            />
+            <Portal>
+              {dirty ? (
+                <FAB
+                  style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+                  icon={(props) => <Feather {...props} name="save" />}
+                  onPress={submitForm}
+                />
+              ) : null}
+            </Portal>
+          </ScrollView>
+        </KeyboardAvoidingView>
         <Button
           icon={() => <Feather name="trash-2" size={s.h5.fontSize} color={c.err} />}
           title="Delete"

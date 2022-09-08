@@ -1,21 +1,21 @@
 import messaging from '@react-native-firebase/messaging'
-import firebase from '@react-native-firebase/app'
+// import firebase from '@react-native-firebase/app'
 import { useEffect } from 'react'
 import { Eventful } from 'types'
-import config from '../google-services.json'
+// import config from '../google-services.json'
 import { api } from '../eventfulLib/api'
 
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    clientId: config.client[0].oauth_client[0].client_id,
-    appId: config.client[0].client_info.mobilesdk_app_id,
-    apiKey: config.client[0].api_key[0].current_key,
-    databaseURL: '',
-    storageBucket: '',
-    messagingSenderId: '',
-    projectId: config.project_info.project_id,
-  })
-}
+// if (!firebase.apps.length) {
+//   firebase.initializeApp({
+//     clientId: config.client[0].oauth_client[0].client_id,
+//     appId: config.client[0].client_info.mobilesdk_app_id,
+//     apiKey: config.client[0].api_key[0].current_key,
+//     databaseURL: '',
+//     storageBucket: '',
+//     messagingSenderId: '',
+//     projectId: config.project_info.project_id,
+//   })
+// }
 
 messaging().setBackgroundMessageHandler(async (msg) => {
   console.log(msg)

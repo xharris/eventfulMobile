@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
 import React, { useMemo } from 'react'
 import { View } from 'react-native'
+import { Caption } from 'react-native-paper'
 import { Eventful } from 'types'
 import { AvatarGroup } from '../components/Avatar'
 import { Card, CardProps } from '../components/Card'
@@ -31,20 +32,21 @@ export const Plan = ({ plan, onPress }: PlanProps) => {
     >
       <View style={[s.flx_c, s.jcc]}>
         <H5 style={[s.bold]}>{title?.length ? title : `Untitled ${info.label.toLowerCase()}`}</H5>
-        {info.fields.location && plan.location && (
+        {info.fields.location && plan.location ? (
           <View style={[s.flx_r, s.aic]}>
             <Feather name="map-pin" color={c.red} />
             <Spacer />
             <H6>{plan.location.address}</H6>
           </View>
-        )}
-        {info.fields.time && plan.time && (
+        ) : null}
+        {info.fields.time && plan.time ? (
           <View style={[s.flx_r, s.aic]}>
             <Feather name="clock" color={c.onSurf} />
             <Spacer />
             <Time time={plan.time} />
           </View>
-        )}
+        ) : null}
+        {!!plan.note?.length ? <Caption>{plan.note}</Caption> : null}
       </View>
       <AvatarGroup
         avatars={plan.who?.map((user) => ({

@@ -21,6 +21,8 @@ yarn turtle build:android --keystore-path upload.keystore --keystore-alias event
 
 OR 
 
+comment `google-services.json` in .gitignore 
+
 ```
 yarn eas build -p android --profile development
 ```

@@ -189,6 +189,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
     <ChatCtxProvider>
       <View style={[s.flx_c, s.flx_1]}>
         <PlanList
+          style={[s.flx_3]}
           event={eventId}
           onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
           onPlanAdd={(body) =>

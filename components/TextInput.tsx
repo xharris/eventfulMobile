@@ -1,4 +1,5 @@
 import { ComponentProps, FC } from 'react'
+import { KeyboardAvoidingView } from 'react-native'
 import { TextInput as PTextInput } from 'react-native-paper'
 
 export type TextInputProps = ComponentProps<typeof PTextInput>

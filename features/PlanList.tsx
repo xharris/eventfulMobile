@@ -33,18 +33,24 @@ export const PlanList = ({
   style,
   ...props
 }: PlanListProps) => {
-  const { data: messages } = useMessages({ event: eventId })
-  const [{ options, editing, replying }, setChatCtx] = useChatCtx()
   const { data: event } = useEvent({ id: eventId })
-  const { session } = useSession()
   const [addPlanVisible, setAddPlanVisible] = useState(false)
 
   const items = useMemo(
     () =>
-      event?.plans.sort(
-        (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
-      ),
-    [event, messages, options]
+      event?.plans.sort((a, b) => {
+        if (!a.time?.start || !b.time?.start) {
+          if (!b.time?.start) {
+            return -1
+          }
+          if (!a.time?.start) {
+            return 1
+          }
+          return 0
+        }
+        return b.time?.start?.date.valueOf() - a.time?.start?.date.valueOf()
+      }),
+    [event]
   )
 
   return (
