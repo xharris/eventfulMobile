@@ -27,6 +27,9 @@ export default {
     //     "remote-notification"
     //   ]
     // }
+    config: {
+      googleMapsApiKey: process.env.MAPS_KEY,
+    },
   },
   android: {
     package: 'com.xhh.eventfulMobile',
@@ -34,6 +37,11 @@ export default {
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
+    },
+    config: {
+      googleMaps: {
+        apiKey: 'AIzaSyBdGkEOfhhCJq4PRqON2QiyJsbMyy-xhM4',
+      },
     },
   },
   web: {

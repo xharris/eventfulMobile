@@ -26,6 +26,7 @@ import { UserSearchScreen } from './screens/UserSearchScreen'
 import { SnackbarProvider, useSnackbar } from './components/Snackbar'
 import { api } from './eventfulLib/api'
 import ERROR from './eventfulLib/error'
+import { MapScreen } from './screens/MapScreen'
 
 const qc = new QueryClient()
 
@@ -62,6 +63,8 @@ const Inner = () => {
 }
 
 const WelcomeStack = createNativeStackNavigator()
+const MapStack = createNativeStackNavigator()
+const PingsStack = createNativeStackNavigator()
 const AgendaStack = createNativeStackNavigator()
 const EventStack = createNativeStackNavigator()
 const UserStack = createNativeStackNavigator()
@@ -91,7 +94,7 @@ const AppNav = () => {
 
   return (
     <BottomTabs.Navigator initialRouteName="AgendaTab" shifting={true}>
-      <BottomTabs.Screen
+      {/* <BottomTabs.Screen
         name="AgendaTab"
         options={{
           title: 'Agenda',
@@ -104,8 +107,36 @@ const AppNav = () => {
             <AgendaStack.Screen name="Events" component={EventsScreen} />
           </AgendaStack.Navigator>
         )}
+      </BottomTabs.Screen> */}
+      <BottomTabs.Screen
+        name="MapTab"
+        options={{
+          title: 'Map',
+          tabBarColor: '#1A237E',
+          tabBarIcon: (props) => <TabIcon {...props} name="map" />,
+        }}
+      >
+        {() => (
+          <MapStack.Navigator>
+            <MapStack.Screen name="Map" component={MapScreen} />
+          </MapStack.Navigator>
+        )}
       </BottomTabs.Screen>
       <BottomTabs.Screen
+        name="PingsTab"
+        options={{
+          title: 'Pings',
+          tabBarColor: '#0D47A1',
+          tabBarIcon: (props) => <TabIcon {...props} name="map-pin" />,
+        }}
+      >
+        {() => (
+          <PingsStack.Navigator>
+            {/* <PingsStack.Screen name="Pings" component={}  /> */}
+          </PingsStack.Navigator>
+        )}
+      </BottomTabs.Screen>
+      {/* <BottomTabs.Screen
         name="EventTab"
         options={{
           title: 'Event',
@@ -132,7 +163,7 @@ const AppNav = () => {
             <EventStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
           </EventStack.Navigator>
         )}
-      </BottomTabs.Screen>
+      </BottomTabs.Screen> */}
       <BottomTabs.Screen
         name="UserTab"
         options={{
