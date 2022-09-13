@@ -40,7 +40,7 @@ export default {
     },
     config: {
       googleMaps: {
-        apiKey: 'AIzaSyBdGkEOfhhCJq4PRqON2QiyJsbMyy-xhM4',
+        apiKey: process.env.MAPS_KEY,
       },
     },
   },

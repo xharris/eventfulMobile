@@ -27,6 +27,7 @@ import { SnackbarProvider, useSnackbar } from './components/Snackbar'
 import { api } from './eventfulLib/api'
 import ERROR from './eventfulLib/error'
 import { MapScreen } from './screens/MapScreen'
+import { PingsScreen } from './screens/PingsScreen'
 
 const qc = new QueryClient()
 
@@ -94,7 +95,7 @@ const AppNav = () => {
 
   return (
     <BottomTabs.Navigator initialRouteName="AgendaTab" shifting={true}>
-      {/* <BottomTabs.Screen
+      <BottomTabs.Screen
         name="AgendaTab"
         options={{
           title: 'Agenda',
@@ -107,8 +108,8 @@ const AppNav = () => {
             <AgendaStack.Screen name="Events" component={EventsScreen} />
           </AgendaStack.Navigator>
         )}
-      </BottomTabs.Screen> */}
-      <BottomTabs.Screen
+      </BottomTabs.Screen>
+      {/* <BottomTabs.Screen
         name="MapTab"
         options={{
           title: 'Map',
@@ -121,8 +122,8 @@ const AppNav = () => {
             <MapStack.Screen name="Map" component={MapScreen} />
           </MapStack.Navigator>
         )}
-      </BottomTabs.Screen>
-      <BottomTabs.Screen
+      </BottomTabs.Screen> */}
+      {/* <BottomTabs.Screen
         name="PingsTab"
         options={{
           title: 'Pings',
@@ -132,11 +133,11 @@ const AppNav = () => {
       >
         {() => (
           <PingsStack.Navigator>
-            {/* <PingsStack.Screen name="Pings" component={}  /> */}
+            <PingsStack.Screen name="Pings" component={PingsScreen} />
           </PingsStack.Navigator>
         )}
-      </BottomTabs.Screen>
-      {/* <BottomTabs.Screen
+      </BottomTabs.Screen> */}
+      <BottomTabs.Screen
         name="EventTab"
         options={{
           title: 'Event',
@@ -163,7 +164,7 @@ const AppNav = () => {
             <EventStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
           </EventStack.Navigator>
         )}
-      </BottomTabs.Screen> */}
+      </BottomTabs.Screen>
       <BottomTabs.Screen
         name="UserTab"
         options={{
