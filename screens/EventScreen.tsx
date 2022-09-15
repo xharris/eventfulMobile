@@ -133,8 +133,10 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   const { addPlan } = usePlans({ event: eventId })
 
   useEffect(() => {
-    store({ lastEvent: eventId })
-  }, [eventId])
+    if (eventId && event?.name) {
+      store({ lastEvent: eventId, lastEventName: event?.name })
+    }
+  }, [eventId, event])
 
   useEffect(() => {
     navigation.setOptions({

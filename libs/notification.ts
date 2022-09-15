@@ -4,6 +4,12 @@ import { useEffect } from 'react'
 import { Eventful } from 'types'
 // import config from '../google-services.json'
 import { api } from '../eventfulLib/api'
+import {
+  getAllScheduledNotificationsAsync,
+  scheduleNotificationAsync,
+  setNotificationHandler,
+} from 'expo-notifications'
+import moment from 'moment'
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -52,4 +58,29 @@ export const useMessaging = () => {
       unsub()
     }
   }, [])
+}
+
+setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+})
+
+export const getScheduledNotifications = async () => {
+  const notifs = await getAllScheduledNotificationsAsync()
+
+  return notifs.map<Eventful.LocalNotification>((notif) => ({
+    data: notif.content.data,
+    expo: notif,
+  }))
+  // scheduleNotificationAsync({
+  //   content: {
+  //     title: 'test',
+  //   },
+  //   trigger: {
+  //     seconds: moment(new Date()).add(5, 's').diff(new Date(), 's'),
+  //   },
+  // })
 }

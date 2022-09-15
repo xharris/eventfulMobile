@@ -1,23 +1,14 @@
 import Feather from '@expo/vector-icons/Feather'
-import { useFormik } from 'formik'
 import React, { useMemo, useState } from 'react'
 import { FlatList, View, ViewProps } from 'react-native'
 import { Eventful } from 'types'
-import { Checkbox, getOnCheckboxColor } from '../components/Checkbox'
 import { Spacer } from '../components/Spacer'
 import { useEvent } from '../eventfulLib/event'
-import { useMessages } from '../eventfulLib/message'
-import { useSession } from '../eventfulLib/session'
-import { Message } from '../features/Message'
 import { Plan } from '../features/Plan'
-import { c, s, spacing } from '../libs/styles'
-import { FAB, IconButton, Menu, Portal } from 'react-native-paper'
-import { useNavigation } from '@react-navigation/native'
-import { MessageList } from './MessageList'
-import { CATEGORY_INFO, usePlan, usePlans } from '../eventfulLib/plan'
+import { c, s } from '../libs/styles'
+import { Button, Headline, IconButton, Menu } from 'react-native-paper'
+import { CATEGORY_INFO } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
-import { H4 } from '../components/Header'
-import { useChatCtx } from './ChatCtx'
 import { Modal } from '../components/Modal'
 
 interface PlanListProps extends ViewProps {
@@ -80,23 +71,39 @@ export const PlanList = ({
             />
           ))}
       </Modal>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={{ padding: 4 }}
-        renderItem={({ item }) => (
-          <View style={[s.flx_1]}>
-            <Plan plan={item} onPress={() => onPlanPress(item._id)} />
-          </View>
-        )}
-      />
-      <View style={[s.flx_r, s.jcsb]}>
-        <Spacer />
-        <IconButton
-          icon={(props) => <Feather name="plus" {...props} />}
-          onPress={() => setAddPlanVisible(true)}
+      {!!items?.length ? (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={{ padding: 4 }}
+          renderItem={({ item }) => (
+            <View style={[s.flx_1]}>
+              <Plan plan={item} onPress={() => onPlanPress(item._id)} />
+            </View>
+          )}
         />
-      </View>
+      ) : (
+        <View style={[s.flx_1, s.jcc, s.c, s.aic]}>
+          <Headline>No plans yet...</Headline>
+          <Spacer size={50} />
+          <Button
+            icon={(props) => <Feather {...props} name="plus" />}
+            mode="contained"
+            onPress={() => setAddPlanVisible(true)}
+          >
+            Add a plan
+          </Button>
+        </View>
+      )}
+      {!!items?.length ? (
+        <View style={[s.flx_r, s.jcsb]}>
+          <Spacer />
+          <IconButton
+            icon={(props) => <Feather name="plus" {...props} />}
+            onPress={() => setAddPlanVisible(true)}
+          />
+        </View>
+      ) : null}
     </View>
   )
 }

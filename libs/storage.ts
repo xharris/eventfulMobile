@@ -9,7 +9,14 @@ export const useStorage = () => {
       const out: Eventful.RN.Storage = {}
       const kv = await AsyncStorage.multiGet(keys)
       kv.forEach(([k, v]) => {
-        out[k as keyof Eventful.RN.Storage] = v
+        let value: string | boolean | null = v
+        if (v === 'true') {
+          value = true
+        }
+        if (v === 'false') {
+          value = false
+        }
+        out[k as keyof Eventful.RN.Storage] = value
       })
       return out
     })
@@ -18,7 +25,7 @@ export const useStorage = () => {
 
   const muSetValue = useMutation(
     ({ key, value }: { key: keyof Eventful.RN.Storage; value: Eventful.RN.Storage[typeof key] }) =>
-      AsyncStorage.setItem(key, value),
+      AsyncStorage.setItem(key, value.toString()),
     {
       onSuccess: (_, { key, value }) => {
         qc.setQueriesData<Eventful.RN.Storage>(['storage'], (prev) => ({

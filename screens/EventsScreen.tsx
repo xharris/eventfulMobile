@@ -1,7 +1,8 @@
 import Feather from '@expo/vector-icons/Feather'
 import React, { useEffect, useState } from 'react'
 import { Pressable, PressableProps, View } from 'react-native'
-import { FAB, Portal } from 'react-native-paper'
+import { FAB, IconButton, Portal } from 'react-native-paper'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Eventful } from 'types'
 import { Avatar, AvatarGroup } from '../components/Avatar'
 import { Button } from '../components/Button'
@@ -45,85 +46,64 @@ const Event = ({
 export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
   const { session } = useSession()
   const { data: events, createEvent, refetch, isRefetching } = useEvents()
-  const [addEventModal, showAddEventModal] = useState(false)
   const [newEventText, setNewEventText] = useState('')
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => null,
-      headerTitle: '',
-      headerRight: () => (
-        <Pressable
-          onPress={() =>
-            navigation.navigate('UserTab', {
-              screen: 'User',
-              params: { user: session?._id },
-            })
-          }
-        >
-          <Avatar size="medium" username={session?.username} />
-        </Pressable>
-      ),
+      headerShown: false,
     })
-  }, [])
+  }, [navigation])
 
   return (
-    <Portal.Host>
-      <View style={[s.c]}>
-        <Agenda
-          items={events}
-          noTimeHeader="TBD"
-          renderItem={(event) => (
-            <Event
-              event={event}
-              onPress={() =>
-                navigation.navigate('App', {
-                  screen: 'EventTab',
-                  params: {
-                    screen: 'Event',
-                    params: { event: event._id },
-                  },
-                })
-              }
-            />
-          )}
-          renderOnEveryDay={false}
-          refreshing={isRefetching}
-          onRefresh={() => refetch()}
+    <SafeAreaView style={[s.c, { flex: 1 }]}>
+      <View style={[s.flx_r, s.aic]}>
+        <TextInput
+          style={[s.flx_1]}
+          placeholder="What are you planning?"
+          value={newEventText}
+          onChangeText={(v) => setNewEventText(v)}
+          mode="outlined"
+          outlineColor="transparent"
+          dense
         />
-        <Portal>
-          <FAB
-            style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-            icon={(props) => <Feather {...props} name="plus" />}
-            onPress={() => showAddEventModal(true)}
-          />
-        </Portal>
-        <Modal visible={addEventModal} onDismiss={() => showAddEventModal(false)}>
-          <TextInput
-            label="New event name"
-            value={newEventText}
-            onChangeText={(v) => setNewEventText(v)}
-          />
-          <Spacer />
-          <View style={[s.flx_r, s.asfe]}>
-            <Button title="Cancel" onPress={() => showAddEventModal(false)} />
-            <Spacer />
-            <Button
-              title="Create"
-              disabled={!newEventText.length}
-              onPress={() => {
-                showAddEventModal(false)
-                createEvent({ name: newEventText }).then((res) =>
-                  navigation.navigate('EventTab', {
-                    screen: 'Event',
-                    params: { event: res.data._id },
-                  })
-                )
-              }}
-            />
-          </View>
-        </Modal>
+        <IconButton
+          icon={(props) => <Feather {...props} name="plus" />}
+          disabled={!newEventText.length}
+          onPress={() => {
+            createEvent({ name: newEventText }).then((res) => {
+              setNewEventText('')
+              navigation.navigate('EventTab', {
+                screen: 'Event',
+                params: { event: res.data._id },
+              })
+            })
+          }}
+          size={25}
+          style={{ marginTop: 12 }}
+        />
       </View>
-    </Portal.Host>
+      <Spacer />
+      <Agenda
+        items={events}
+        noTimeHeader="TBD"
+        renderItem={(event) => (
+          <Event
+            event={event}
+            onPress={() =>
+              navigation.navigate('App', {
+                screen: 'EventTab',
+                params: {
+                  screen: 'Event',
+                  params: { event: event._id },
+                },
+              })
+            }
+          />
+        )}
+        renderOnEveryDay={false}
+        refreshing={isRefetching}
+        onRefresh={() => refetch()}
+      />
+    </SafeAreaView>
   )
 }

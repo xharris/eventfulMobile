@@ -1,5 +1,7 @@
 import 'dotenv/config'
 
+const { MAPS_KEY } = process.env as unknown as { MAPS_KEY: string }
+
 export default {
   name: 'eventfulMobile',
   slug: 'eventfulMobile',
@@ -20,15 +22,12 @@ export default {
   ios: {
     supportsTablet: true,
     useFrameworks: 'static',
-    // googleServicesFile: './GoogleService-Info.plist',
-    // infoPlist: {
-    //   UIBackgroundModes: [
-    //     "fetch",
-    //     "remote-notification"
-    //   ]
-    // }
+    googleServicesFile: './GoogleService-Info.plist',
+    infoPlist: {
+      UIBackgroundModes: ['fetch', 'remote-notification'],
+    },
     config: {
-      googleMapsApiKey: process.env.MAPS_KEY,
+      googleMapsApiKey: MAPS_KEY,
     },
   },
   android: {
@@ -40,7 +39,7 @@ export default {
     },
     config: {
       googleMaps: {
-        apiKey: process.env.MAPS_KEY,
+        apiKey: MAPS_KEY,
       },
     },
   },

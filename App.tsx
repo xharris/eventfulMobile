@@ -90,7 +90,7 @@ const TabIcon = ({
 }
 
 const AppNav = () => {
-  const [storage, store] = useStorage()
+  const [storage] = useStorage()
   const { session } = useSession()
 
   return (

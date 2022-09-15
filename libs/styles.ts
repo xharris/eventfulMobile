@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, Easing, StyleSheet, TextStyle, ViewStyle } from 'react-native'
+import {
+  Animated,
+  Easing,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 export { default as styled } from 'styled-components/native'
 
 const range = <K extends string, T>(len: number, cb: (i: number, len: number) => Record<K, T>) =>
@@ -68,6 +76,9 @@ export const s = StyleSheet.create({
       fontSize: lerp(14, 36, (6 - i) / 6), // large (16, 50)
     },
   })) as Record<HeaderSize, TextStyle>),
+  safe: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
   flx_r: {
     flexDirection: 'row',
   },
