@@ -1,16 +1,15 @@
 import Feather from '@expo/vector-icons/Feather'
-import moment from 'moment'
-import React, { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react'
-import { Platform, Pressable, View, ViewProps } from 'react-native'
+import moment from 'moment-timezone'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Pressable, View, ViewProps } from 'react-native'
 import { Eventful } from 'types'
 import { c, s } from '../libs/styles'
 import { H4 } from './Header'
 import { Spacer } from './Spacer'
-import DateTimePicker, {
-  DateTimePickerAndroid,
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker'
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import { Caption } from 'react-native-paper'
+
+const parseDate = (date: Date) => moment(date).toDate()
 
 export interface DateTimeInputProps extends ViewProps {
   defaultValue?: Eventful.TimePart
@@ -26,16 +25,16 @@ export const DateTimeInput = ({
   ...props
 }: DateTimeInputProps) => {
   const [mode, setMode] = useState<'date' | 'time' | null>(null)
-  const [date, setDate] = useState(defaultValue?.date ? new Date(defaultValue.date) : null)
+  const [date, setDate] = useState(defaultValue?.date ? parseDate(defaultValue.date) : null)
   const [time, setTime] = useState(
-    defaultValue?.date && !defaultValue.allday ? new Date(defaultValue?.date) : null
+    defaultValue?.date && !defaultValue.allday ? parseDate(defaultValue?.date) : null
   )
   const [allday, setAllday] = useState(defaultValue?.allday)
 
   useEffect(() => {
     if (defaultValue) {
-      setDate(new Date(defaultValue.date))
-      setTime(defaultValue?.date && !defaultValue.allday ? new Date(defaultValue?.date) : null)
+      setDate(parseDate(defaultValue.date))
+      setTime(defaultValue?.date && !defaultValue.allday ? parseDate(defaultValue?.date) : null)
     }
   }, [defaultValue])
 
@@ -55,7 +54,9 @@ export const DateTimeInput = ({
                     _time ? moment(_time).format('HH:mm') : '',
                   ].join(' '),
                   'YYYY-MM-DD HH:mm'
-                ).toDate(),
+                )
+                  .utc()
+                  .toDate(),
                 allday: !_time,
               }
             : null
@@ -65,14 +66,7 @@ export const DateTimeInput = ({
     [onChange]
   )
 
-  const currentValue = useMemo(
-    () =>
-      moment(date ?? Date.now())
-        .startOf('day')
-        .add(moment(time ?? Date.now()).minutes(), 'minutes')
-        .toDate(),
-    [date, time]
-  )
+  const currentValue = useMemo(() => moment(time ?? Date.now()).toDate(), [time])
 
   const onDateTimePickerChange = useCallback(
     (e: DateTimePickerEvent, v?: Date) => {

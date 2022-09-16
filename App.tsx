@@ -28,12 +28,18 @@ import { api } from './eventfulLib/api'
 import ERROR from './eventfulLib/error'
 import { MapScreen } from './screens/MapScreen'
 import { PingsScreen } from './screens/PingsScreen'
+import { ReminderEditScreen } from './screens/ReminderEditScreen'
+import moment from 'moment-timezone'
+import { useReminderScheduler } from './eventfulLib/reminder'
+
+moment.tz.setDefault()
 
 const qc = new QueryClient()
 
 const Inner = () => {
   useSession(true)
   const { show } = useSnackbar()
+  useReminderScheduler()
 
   useEffect(() => {
     const ic = api.interceptors.response.use(
@@ -181,6 +187,7 @@ const AppNav = () => {
               initialParams={{ user: session?._id }}
             />
             <UserStack.Screen name="Contacts" component={ContactsScreen} />
+            <UserStack.Screen name="ReminderEdit" component={ReminderEditScreen} />
             <UserStack.Screen
               name="UserSearch"
               component={UserSearchScreen}

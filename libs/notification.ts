@@ -5,11 +5,12 @@ import { Eventful } from 'types'
 // import config from '../google-services.json'
 import { api } from '../eventfulLib/api'
 import {
+  cancelAllScheduledNotificationsAsync,
   getAllScheduledNotificationsAsync,
   scheduleNotificationAsync,
   setNotificationHandler,
 } from 'expo-notifications'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -68,6 +69,10 @@ setNotificationHandler({
   }),
 })
 
+export const cancelAllScheduledNotifications = async () => {
+  await cancelAllScheduledNotificationsAsync()
+}
+
 export const getScheduledNotifications = async () => {
   const notifs = await getAllScheduledNotificationsAsync()
 
@@ -75,12 +80,9 @@ export const getScheduledNotifications = async () => {
     data: notif.content.data,
     expo: notif,
   }))
-  // scheduleNotificationAsync({
-  //   content: {
-  //     title: 'test',
-  //   },
-  //   trigger: {
-  //     seconds: moment(new Date()).add(5, 's').diff(new Date(), 's'),
-  //   },
-  // })
+}
+
+export const scheduleNotification = async (notification: Eventful.LocalNotification) => {
+  console.log(JSON.stringify(notification.expo))
+  return await scheduleNotificationAsync(notification.expo)
 }

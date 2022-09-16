@@ -59,6 +59,13 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
             <Spacer />
             <Button
               mode="outlined"
+              onPress={() => navigation.push('ReminderEdit', { user })}
+              title="Reminders"
+              icon={(props) => <Feather {...props} name="bell" />}
+            />
+            <Spacer />
+            <Button
+              mode="outlined"
               disabled
               onPress={() => null}
               title="Settings"

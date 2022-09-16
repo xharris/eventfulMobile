@@ -1,5 +1,5 @@
 import { useFormik } from 'formik'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Checkbox } from '../components/Checkbox'
 import { SectionList, View, Text } from 'react-native'

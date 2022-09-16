@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { ComponentProps, useMemo } from 'react'
 import { Eventful } from 'types'
 import { H6 } from './Header'
@@ -23,6 +23,11 @@ const calendarFormatTime = {
   nextWeek: 'dddd [at] LT',
   sameElse: 'LT',
 }
+
+export const formatStart = (time: Eventful.Time) =>
+  time.start
+    ? moment(time.start.date).calendar(time.start?.allday ? calendarFormat : calendarFormatTime)
+    : null
 
 export const Time = ({ time, ...props }: TimeProps) => {
   const str = useMemo(() => {
