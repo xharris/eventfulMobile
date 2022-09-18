@@ -9,8 +9,12 @@ import {
   getAllScheduledNotificationsAsync,
   scheduleNotificationAsync,
   setNotificationHandler,
+  useLastNotificationResponse,
 } from 'expo-notifications'
-import moment from 'moment-timezone'
+import { logExtend } from './log'
+import * as Linking from 'expo-linking'
+
+const log = logExtend('LIB/NOTIFICATION')
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -38,8 +42,8 @@ export const requestPermission = () =>
     )
 
 export const showLocalNotification = (payload: Eventful.NotificationPayload) =>
-  new Notification(payload.notification.title ?? '', {
-    body: payload.notification.body,
+  new Notification(payload.notification?.title ?? '', {
+    body: payload.notification?.body,
   })
 
 export const useMessaging = () => {
@@ -59,6 +63,15 @@ export const useMessaging = () => {
       unsub()
     }
   }, [])
+  // expo last notification response
+  const lastResponse = useLastNotificationResponse()
+  useEffect(() => {
+    const url = lastResponse?.notification.request.content.data.url as string
+    if (url) {
+      log.info('open url', url)
+      Linking.openURL(url)
+    }
+  }, [lastResponse])
 }
 
 setNotificationHandler({
@@ -70,19 +83,27 @@ setNotificationHandler({
 })
 
 export const cancelAllScheduledNotifications = async () => {
+  log.info('cancel all scheduled notifications')
   await cancelAllScheduledNotificationsAsync()
 }
 
 export const getScheduledNotifications = async () => {
   const notifs = await getAllScheduledNotificationsAsync()
 
-  return notifs.map<Eventful.LocalNotification>((notif) => ({
-    data: notif.content.data,
-    expo: notif,
-  }))
+  return notifs.map(
+    ({ content, identifier, trigger }) =>
+      ({
+        expo: {
+          content,
+          trigger,
+          identifier,
+        },
+        data: content.data,
+      } as Eventful.LocalNotification)
+  )
 }
 
 export const scheduleNotification = async (notification: Eventful.LocalNotification) => {
-  console.log(JSON.stringify(notification.expo))
+  log.info('schedule notification', notification.expo)
   return await scheduleNotificationAsync(notification.expo)
 }

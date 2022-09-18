@@ -2,7 +2,7 @@
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider, useSession } from './eventfulLib/session'
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
+import { DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
 import { EventsScreen } from './screens/EventsScreen'
 import { Eventful } from 'types'
 import { Provider, DefaultTheme as DefaultPaperTheme } from 'react-native-paper'
@@ -31,6 +31,11 @@ import { PingsScreen } from './screens/PingsScreen'
 import { ReminderEditScreen } from './screens/ReminderEditScreen'
 import moment from 'moment-timezone'
 import { useReminderScheduler } from './eventfulLib/reminder'
+import { DevScreen } from './screens/DevScreen'
+import { logExtend } from './libs/log'
+import { parse, useURL } from 'expo-linking'
+
+const log = logExtend('APP')
 
 moment.tz.setDefault()
 
@@ -40,6 +45,31 @@ const Inner = () => {
   useSession(true)
   const { show } = useSnackbar()
   useReminderScheduler()
+  const url = useURL()
+
+  const navigation = useNavigation<Eventful.RN.RootStackScreenProps<'App'>['navigation']>()
+
+  useEffect(() => {
+    if (url) {
+      const { queryParams } = parse(url)
+      if (queryParams) {
+        log.info('deep link', url, queryParams)
+        const { eventId, userId } = queryParams as { eventId?: string; userId?: string }
+        if (eventId) {
+          navigation.navigate('App', {
+            screen: 'EventTab',
+            params: { screen: 'Event', params: { event: eventId } },
+          })
+        }
+        if (userId) {
+          navigation.navigate('App', {
+            screen: 'UserTab',
+            params: { screen: 'User', params: { user: userId } },
+          })
+        }
+      }
+    }
+  }, [url, navigation])
 
   useEffect(() => {
     const ic = api.interceptors.response.use(
@@ -47,12 +77,12 @@ const Inner = () => {
       (err) => {
         const code = err.response.status
         const status = err.response.data ?? err.code
-        console.log(`[API] code=${code} text=${status}`)
+        log.error(`[API] code=${code} text=${status}`)
         if (code === 503) {
           show({
             text: 'Server unavailable',
           })
-        } else if (code >= 400 && status) {
+        } else if (code >= 400 && code !== 401 && status) {
           show({
             text: status in ERROR ? ERROR[status] : status,
           })
@@ -148,7 +178,8 @@ const AppNav = () => {
         options={{
           title: 'Event',
           tabBarColor: '#0D47A1',
-          tabBarIcon: (props) => <TabIcon {...props} name="align-left" />,
+          tabBarIcon: (props) =>
+            !!storage?.lastEvent ? <TabIcon {...props} name="align-left" /> : null,
         }}
         listeners={{
           tabPress: (e) => {
@@ -193,6 +224,11 @@ const AppNav = () => {
               component={UserSearchScreen}
               options={{ title: 'Search for people' }}
             />
+            <UserStack.Screen
+              name="Dev"
+              component={DevScreen}
+              options={{ title: 'WTF is going on' }}
+            />
           </UserStack.Navigator>
         )}
       </BottomTabs.Screen>
@@ -230,9 +266,9 @@ export default function App() {
       >
         <SessionProvider>
           <SnackbarProvider>
-            <Inner />
             <SafeAreaProvider>
               <NavigationContainer>
+                <Inner />
                 <Nav />
               </NavigationContainer>
             </SafeAreaProvider>

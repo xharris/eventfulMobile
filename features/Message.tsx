@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
 import React, { useEffect, useMemo } from 'react'
 import { Pressable, PressableProps, View } from 'react-native'
+import { Paragraph, Text } from 'react-native-paper'
 import { Eventful } from 'types'
 import { Avatar } from '../components/Avatar'
 import { Card } from '../components/Card'
@@ -52,7 +53,7 @@ export const Message = ({ message, prevSameUser, ...props }: MessageProps) => {
           }}
         />
         <Spacer />
-        <H5 textBreakStrategy="balanced">{message.text}</H5>
+        <Paragraph textBreakStrategy="balanced">{message.text}</Paragraph>
       </Pressable>
     </View>
   )

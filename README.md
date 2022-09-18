@@ -24,9 +24,15 @@ OR
 comment `google-services.json` in .gitignore 
 
 ```
-yarn eas build -p android --profile development
+yarn build --local
 ```
 
 download artifact from https://expo.dev
 
 `adb install app-relase.apk`
+
+# Testing a deep link
+
+```
+npx uri-scheme open com.xhh.eventfulMobile://eventful?eventId=SOME_EVENT_ID
+```

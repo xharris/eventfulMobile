@@ -6,7 +6,7 @@ import { Spacer } from '../components/Spacer'
 import { useEvent } from '../eventfulLib/event'
 import { Plan } from '../features/Plan'
 import { c, s } from '../libs/styles'
-import { Button, Headline, IconButton, Menu } from 'react-native-paper'
+import { Button, Dialog, Headline, IconButton, List, Menu, Portal } from 'react-native-paper'
 import { CATEGORY_INFO } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
 import { Modal } from '../components/Modal'
@@ -56,21 +56,25 @@ export const PlanList = ({
           ]}
         />
       </View>
-      <Modal visible={addPlanVisible} onDismiss={() => setAddPlanVisible(false)}>
-        {Object.entries(CATEGORY_INFO)
-          .reverse()
-          .map(([key, cat]) => (
-            <Menu.Item
-              key={key}
-              title={cat.label}
-              icon={CATEGORY_ICON[parseInt(key)]}
-              onPress={() => {
-                setAddPlanVisible(false)
-                onPlanAdd({ category: parseInt(key) })
-              }}
-            />
-          ))}
-      </Modal>
+      <Portal>
+        <Dialog visible={addPlanVisible} onDismiss={() => setAddPlanVisible(false)}>
+          <Dialog.Content>
+            {Object.entries(CATEGORY_INFO)
+              .reverse()
+              .map(([key, cat]) => (
+                <List.Item
+                  key={key}
+                  left={(props) => <List.Icon {...props} icon={CATEGORY_ICON[parseInt(key)]} />}
+                  onPress={() => {
+                    setAddPlanVisible(false)
+                    onPlanAdd({ category: parseInt(key) })
+                  }}
+                  title={cat.label}
+                />
+              ))}
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
       {!!items?.length ? (
         <FlatList
           data={items}

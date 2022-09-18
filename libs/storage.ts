@@ -24,8 +24,8 @@ export const useStorage = () => {
   const qc = useQueryClient()
 
   const muSetValue = useMutation(
-    ({ key, value }: { key: keyof Eventful.RN.Storage; value: Eventful.RN.Storage[typeof key] }) =>
-      AsyncStorage.setItem(key, value.toString()),
+    ({ key, value }: { key: keyof Eventful.RN.Storage; value?: Eventful.RN.Storage[typeof key] }) =>
+      AsyncStorage.setItem(key, value?.toString() ?? ''),
     {
       onSuccess: (_, { key, value }) => {
         qc.setQueriesData<Eventful.RN.Storage>(['storage'], (prev) => ({

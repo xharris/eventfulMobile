@@ -1,6 +1,10 @@
+import { ExpoConfig } from '@expo/config-types'
 import 'dotenv/config'
 
-const { MAPS_KEY } = process.env as unknown as { MAPS_KEY: string }
+const { MAPS_KEY, NODE_ENV } = process.env as unknown as {
+  MAPS_KEY: string
+  NODE_ENV: 'development' | 'production'
+}
 
 export default {
   name: 'eventfulMobile',
@@ -8,7 +12,7 @@ export default {
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
-  scheme: 'myapp',
+  scheme: NODE_ENV === 'production' ? 'eventful' : 'com.xhh.eventfulMobile',
   userInterfaceStyle: 'automatic',
   _splash: {
     image: './assets/images/splash.png',
@@ -25,6 +29,7 @@ export default {
     googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       UIBackgroundModes: ['fetch', 'remote-notification'],
+      LSApplicationQueriesSchemes: ['eventful'],
     },
     config: {
       googleMapsApiKey: MAPS_KEY,
@@ -42,6 +47,7 @@ export default {
         apiKey: MAPS_KEY,
       },
     },
+    permissions: ['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE'],
   },
   web: {
     favicon: './assets/images/favicon.png',
@@ -56,4 +62,4 @@ export default {
     '@react-native-firebase/app',
     // '@react-native-firebase/messaging'
   ],
-}
+} as ExpoConfig
