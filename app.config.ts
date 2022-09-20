@@ -63,5 +63,11 @@ export default {
   plugins: [
     '@react-native-firebase/app',
     // '@react-native-firebase/messaging'
+    ["expo-build-properties",
+    {
+      "ios": {
+        useFrameworks: 'static',
+      }
+    }]
   ],
 } as ExpoConfig
