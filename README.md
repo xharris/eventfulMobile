@@ -11,6 +11,27 @@
 - all plan locations as pins on map
 - expense tracking (could be plan type)
 
+# Env Vars
+
+```
+IS_MOBILE=true
+MAPS_KEY=
+
+EXPO_ANDROID_KEYSTORE_PASSWORD=
+EXPO_ANDROID_KEY_PASSWORD=
+
+# prod
+
+REACT_APP_API_URL=https://eventful.fly.dev/api
+REACT_APP_SOCKET_URL=https://eventful.fly.dev
+
+# dev
+
+# NODE_ENV=development
+REACT_APP_API_URL=<IP_ADDRESS:PORT>/api
+REACT_APP_SOCKET_URL=<IP_ADDRESS:PORT>
+```
+
 # Build android
 
 ```

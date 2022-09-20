@@ -24,6 +24,7 @@ export default {
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    bundleIdentifier: 'com.xhh.eventfulMobile',
     supportsTablet: true,
     useFrameworks: 'static',
     googleServicesFile: './GoogleService-Info.plist',
