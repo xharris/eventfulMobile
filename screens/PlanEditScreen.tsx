@@ -34,21 +34,22 @@ export const PlanEditScreen = ({
   const [menuVisible, setMenuVisible] = useState(false)
   const { show } = useSnackbar()
 
-  const { errors, setFieldValue, resetForm, values, dirty, submitForm } =
-    useFormik<Eventful.API.PlanEdit>({
-      initialValues: {
-        _id: null,
-        ...plan,
-        who: plan?.who?.map((user) => user._id) ?? [],
-      },
-      enableReinitialize: true,
-      onSubmit: (values) => {
+  const { errors, setFieldValue, resetForm, values, dirty, submitForm } = useFormik({
+    initialValues: {
+      _id: null,
+      ...plan,
+      who: plan?.who?.map((user) => user._id) ?? [],
+    },
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      if (plan) {
         updatePlan({
           ...values,
           _id: plan?._id,
         }).then(() => resetForm())
-      },
-    })
+      }
+    },
+  })
 
   const info = useMemo(() => CATEGORY_INFO[values.category ?? plan?.category ?? 0], [plan, values])
 
@@ -120,8 +121,9 @@ export const PlanEditScreen = ({
             {info.fields.who ? (
               <TouchableRipple
                 onPress={() =>
+                  session &&
                   navigation.push('ContactSelect', {
-                    user: session?._id,
+                    user: session._id,
                     selected: values.who ?? [],
                   })
                 }

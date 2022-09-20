@@ -32,7 +32,7 @@ const log = logExtend('USER')
 
 export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
   const { user } = route.params
-  const { data } = useUser({ id: user })
+  const { data } = useUser({ id: user.toString() })
   const { session, logOut } = useSession()
   const { data: contacts, addContact, removeContact } = useContacts({ user: session?._id })
   const [devPresses, setDevPresses] = useState(0)

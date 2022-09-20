@@ -92,7 +92,7 @@ export const ReminderEditScreen = ({
   ) : (
     <View style={[s.c, s.flx_1, s.flx_c]}>
       {reminders?.map((reminder) => (
-        <Reminder key={reminder._id} reminder={reminder} />
+        <Reminder key={reminder._id.toString()} reminder={reminder} />
       ))}
       <IconButton
         style={[s.aife]}

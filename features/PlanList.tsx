@@ -78,7 +78,7 @@ export const PlanList = ({
       {!!items?.length ? (
         <FlatList
           data={items}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => item._id.toString()}
           contentContainerStyle={{ padding: 4 }}
           renderItem={({ item }) => (
             <View style={[s.flx_1]}>

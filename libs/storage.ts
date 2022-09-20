@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Eventful } from 'types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -16,7 +15,9 @@ export const useStorage = () => {
         if (v === 'false') {
           value = false
         }
-        out[k as keyof Eventful.RN.Storage] = value
+        if (value != null) {
+          out[k as keyof Eventful.RN.Storage] = value as any // idc
+        }
       })
       return out
     })

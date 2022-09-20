@@ -54,7 +54,7 @@ const Inner = () => {
       const { queryParams } = parse(url)
       if (queryParams) {
         log.info('deep link', url, queryParams)
-        const { eventId, userId } = queryParams as { eventId?: string; userId?: string }
+        const { eventId, userId } = queryParams as { eventId?: Eventful.ID; userId?: Eventful.ID }
         if (eventId) {
           navigation.navigate('App', {
             screen: 'EventTab',

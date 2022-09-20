@@ -19,7 +19,7 @@ export const ContactsScreen = ({
     <View style={[s.c, s.flx_1]}>
       {data?.map((contact) => (
         <List.Item
-          key={contact._id}
+          key={contact._id.toString()}
           title={contact.username}
           left={(props) => <Avatar username={contact.username} size="medium" />}
           onPress={() => navigation.push('User', { user: contact._id })}
