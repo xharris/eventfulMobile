@@ -34,6 +34,7 @@ export default {
     },
     config: {
       googleMapsApiKey: MAPS_KEY,
+      
     },
   },
   android: {

@@ -52,6 +52,12 @@ download artifact from https://expo.dev
 
 `adb install app-relase.apk`
 
+# Building iOS
+
+- download GoogleService-Info.plist
+- put it in root dir of project
+- `yarn ios -d`
+
 # Testing a deep link
 
 ```
