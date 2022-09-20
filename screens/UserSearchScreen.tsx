@@ -25,7 +25,7 @@ export const UserSearchScreen = ({
       <Spacer />
       <View style={[s.flx_c]}>
         {users.map((user) => (
-          <View key={user._id} style={[s.c, s.flx_r, s.jcsb, s.aic]}>
+          <View key={user._id.toString()} style={[s.c, s.flx_r, s.jcsb, s.aic]}>
             <Pressable
               style={[
                 s.flx_1,

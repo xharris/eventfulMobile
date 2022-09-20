@@ -22,7 +22,7 @@ export const Avatar = ({
   style,
   ...props
 }: AvatarProps) => {
-  const { data: { username } = { username: _username } } = useUser({ id })
+  const { data: { username } = { username: _username } } = useUser({ id: id?.toString() })
   const sizeDim = useMemo(() => (size === 'small' ? 30 : size === 'medium' ? 40 : 100), [size])
   const fontSize = useMemo(() => (size === 'small' ? 12 : size === 'medium' ? 16 : 32), [size])
   return (
@@ -74,7 +74,7 @@ export const AvatarGroup = ({
         <Avatar
           {...props}
           {...avatar}
-          key={avatar.id ?? avatar.username ?? a}
+          key={(avatar.id ?? avatar.username ?? a).toString()}
           style={{
             marginLeft: -12,
             borderWidth: 1,

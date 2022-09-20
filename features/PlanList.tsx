@@ -1,23 +1,14 @@
 import Feather from '@expo/vector-icons/Feather'
-import { useFormik } from 'formik'
 import React, { useMemo, useState } from 'react'
 import { FlatList, View, ViewProps } from 'react-native'
 import { Eventful } from 'types'
-import { Checkbox, getOnCheckboxColor } from '../components/Checkbox'
 import { Spacer } from '../components/Spacer'
 import { useEvent } from '../eventfulLib/event'
-import { useMessages } from '../eventfulLib/message'
-import { useSession } from '../eventfulLib/session'
-import { Message } from '../features/Message'
 import { Plan } from '../features/Plan'
-import { c, s, spacing } from '../libs/styles'
-import { FAB, IconButton, Menu, Portal } from 'react-native-paper'
-import { useNavigation } from '@react-navigation/native'
-import { MessageList } from './MessageList'
-import { CATEGORY_INFO, usePlan, usePlans } from '../eventfulLib/plan'
+import { c, s } from '../libs/styles'
+import { Button, Dialog, Headline, IconButton, List, Menu, Portal } from 'react-native-paper'
+import { CATEGORY_INFO } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
-import { H4 } from '../components/Header'
-import { useChatCtx } from './ChatCtx'
 import { Modal } from '../components/Modal'
 
 interface PlanListProps extends ViewProps {
@@ -65,38 +56,58 @@ export const PlanList = ({
           ]}
         />
       </View>
-      <Modal visible={addPlanVisible} onDismiss={() => setAddPlanVisible(false)}>
-        {Object.entries(CATEGORY_INFO)
-          .reverse()
-          .map(([key, cat]) => (
-            <Menu.Item
-              key={key}
-              title={cat.label}
-              icon={CATEGORY_ICON[parseInt(key)]}
-              onPress={() => {
-                setAddPlanVisible(false)
-                onPlanAdd({ category: parseInt(key) })
-              }}
-            />
-          ))}
-      </Modal>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={{ padding: 4 }}
-        renderItem={({ item }) => (
-          <View style={[s.flx_1]}>
-            <Plan plan={item} onPress={() => onPlanPress(item._id)} />
-          </View>
-        )}
-      />
-      <View style={[s.flx_r, s.jcsb]}>
-        <Spacer />
-        <IconButton
-          icon={(props) => <Feather name="plus" {...props} />}
-          onPress={() => setAddPlanVisible(true)}
+      <Portal>
+        <Dialog visible={addPlanVisible} onDismiss={() => setAddPlanVisible(false)}>
+          <Dialog.Content>
+            {Object.entries(CATEGORY_INFO)
+              .reverse()
+              .map(([key, cat]) => (
+                <List.Item
+                  key={key}
+                  left={(props) => <List.Icon {...props} icon={CATEGORY_ICON[parseInt(key)]} />}
+                  onPress={() => {
+                    setAddPlanVisible(false)
+                    onPlanAdd({ category: parseInt(key) })
+                  }}
+                  title={cat.label}
+                />
+              ))}
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      {!!items?.length ? (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item._id.toString()}
+          contentContainerStyle={{ padding: 4 }}
+          renderItem={({ item }) => (
+            <View style={[s.flx_1]}>
+              <Plan plan={item} onPress={() => onPlanPress(item._id)} />
+            </View>
+          )}
         />
-      </View>
+      ) : (
+        <View style={[s.flx_1, s.jcc, s.c, s.aic]}>
+          <Headline>No plans yet...</Headline>
+          <Spacer size={50} />
+          <Button
+            icon={(props) => <Feather {...props} name="plus" />}
+            mode="contained"
+            onPress={() => setAddPlanVisible(true)}
+          >
+            Add a plan
+          </Button>
+        </View>
+      )}
+      {!!items?.length ? (
+        <View style={[s.flx_r, s.jcsb]}>
+          <Spacer />
+          <IconButton
+            icon={(props) => <Feather name="plus" {...props} />}
+            onPress={() => setAddPlanVisible(true)}
+          />
+        </View>
+      ) : null}
     </View>
   )
 }

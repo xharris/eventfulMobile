@@ -14,7 +14,7 @@ import { useSession } from '../eventfulLib/session'
 import { Message } from '../features/Message'
 import { Plan } from '../features/Plan'
 import { c, s, spacing } from '../libs/styles'
-import { FAB, IconButton, Menu, Portal } from 'react-native-paper'
+import { Dialog, FAB, IconButton, Menu, Portal } from 'react-native-paper'
 import createStateContext from 'react-use/lib/factory/createStateContext'
 import { CommonActions, CompositeScreenProps, useNavigation } from '@react-navigation/native'
 import { useStorage } from '../libs/storage'
@@ -25,6 +25,9 @@ import { AreYouSure } from '../libs/dialog'
 import { MessageList } from '../features/MessageList'
 import { PlanList } from '../features/PlanList'
 import { ChatCtxProvider, useChatCtx } from '../features/ChatCtx'
+import { logExtend } from '../libs/log'
+
+const log = logExtend('EVENTSCREEN')
 
 const EventInput = ({ event }: { event: Eventful.ID }) => {
   const [text, setText] = useState('')
@@ -116,7 +119,7 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
 
 export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenProps<'Event'>) => {
   const { event: eventId } = route.params
-  const { data: event, updateEvent, deleteEvent } = useEvent({ id: eventId })
+  const { data: event, error, updateEvent, deleteEvent } = useEvent({ id: eventId })
   const { session } = useSession()
   const { dirty, setFieldValue, values, submitForm } = useFormik<Eventful.API.EventUpdate>({
     initialValues: {
@@ -133,8 +136,15 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   const { addPlan } = usePlans({ event: eventId })
 
   useEffect(() => {
-    store({ lastEvent: eventId })
-  }, [eventId])
+    if (eventId && event?.name) {
+      log.info('store', { lastEvent: eventId, lastEventName: event.name })
+      store({ lastEvent: eventId, lastEventName: event.name })
+    }
+    if (error) {
+      log.error(error)
+      store({ lastEvent: undefined, lastEventName: undefined })
+    }
+  }, [eventId, event, error])
 
   useEffect(() => {
     navigation.setOptions({
@@ -189,7 +199,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
     <ChatCtxProvider>
       <View style={[s.flx_c, s.flx_1]}>
         <PlanList
-          style={[s.flx_3]}
+          style={[s.flx_1]}
           event={eventId}
           onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
           onPlanAdd={(body) =>
@@ -199,16 +209,16 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
         <MessageList event={eventId} style={[s.flx_1]} />
         <EventInput event={eventId} />
       </View>
-      <Modal visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
-        <TextInput
-          label="Event name"
-          value={values.name}
-          onChangeText={(v) => setFieldValue('name', v)}
-        />
-        <Spacer />
-        <View style={[s.flx_r, s.asfe]}>
+      <Dialog visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
+        <Dialog.Content>
+          <TextInput
+            label="Event name"
+            value={values.name}
+            onChangeText={(v) => setFieldValue('name', v)}
+          />
+        </Dialog.Content>
+        <Dialog.Actions>
           <Button title="Cancel" onPress={() => setShowTitleEdit(false)} />
-          <Spacer />
           <Button
             title="Save"
             disabled={!dirty}
@@ -217,8 +227,8 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
               submitForm()
             }}
           />
-        </View>
-      </Modal>
+        </Dialog.Actions>
+      </Dialog>
     </ChatCtxProvider>
   )
 }

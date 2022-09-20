@@ -4,6 +4,17 @@ import { useEffect } from 'react'
 import { Eventful } from 'types'
 // import config from '../google-services.json'
 import { api } from '../eventfulLib/api'
+import {
+  cancelAllScheduledNotificationsAsync,
+  getAllScheduledNotificationsAsync,
+  scheduleNotificationAsync,
+  setNotificationHandler,
+  useLastNotificationResponse,
+} from 'expo-notifications'
+import { logExtend } from './log'
+import * as Linking from 'expo-linking'
+
+const log = logExtend('LIB/NOTIFICATION')
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -31,8 +42,8 @@ export const requestPermission = () =>
     )
 
 export const showLocalNotification = (payload: Eventful.NotificationPayload) =>
-  new Notification(payload.notification.title ?? '', {
-    body: payload.notification.body,
+  new Notification(payload.notification?.title ?? '', {
+    body: payload.notification?.body,
   })
 
 export const useMessaging = () => {
@@ -52,4 +63,47 @@ export const useMessaging = () => {
       unsub()
     }
   }, [])
+  // expo last notification response
+  const lastResponse = useLastNotificationResponse()
+  useEffect(() => {
+    const url = lastResponse?.notification.request.content.data.url as string
+    if (url) {
+      log.info('open url', url)
+      Linking.openURL(url)
+    }
+  }, [lastResponse])
+}
+
+setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+})
+
+export const cancelAllScheduledNotifications = async () => {
+  log.info('cancel all scheduled notifications')
+  await cancelAllScheduledNotificationsAsync()
+}
+
+export const getScheduledNotifications = async () => {
+  const notifs = await getAllScheduledNotificationsAsync()
+
+  return notifs.map(
+    ({ content, identifier, trigger }) =>
+      ({
+        expo: {
+          content,
+          trigger,
+          identifier,
+        },
+        data: content.data,
+      } as Eventful.LocalNotification)
+  )
+}
+
+export const scheduleNotification = async (notification: Eventful.LocalNotification) => {
+  log.info('schedule notification', notification.expo)
+  return await scheduleNotificationAsync(notification.expo)
 }

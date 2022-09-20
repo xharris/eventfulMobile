@@ -1,13 +1,15 @@
 import { useFormik } from 'formik'
-import moment from 'moment'
-import React, { ReactNode, useEffect, useMemo } from 'react'
+import moment from 'moment-timezone'
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Checkbox } from '../components/Checkbox'
 import { SectionList, View, Text } from 'react-native'
 import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
 import { c, s, spacing } from '../libs/styles'
 import { Spacer } from '../components/Spacer'
-import { Headline, Subheading, Title } from 'react-native-paper'
+import { Button, Headline, Subheading, Title, TouchableRipple } from 'react-native-paper'
+import Feather from '@expo/vector-icons/Feather'
+import { useStorage } from '../libs/storage'
 
 // TODO: show past days with less opacity
 
@@ -141,16 +143,7 @@ export const Agenda = <I extends Item = Item>({
   onRefresh,
   refreshing,
 }: AgendaProps<I>) => {
-  const {
-    values: options,
-    handleChange,
-    setFieldValue,
-  } = useFormik<AgendaOptions>({
-    initialValues: {
-      tbd: true,
-    },
-    onSubmit: () => {},
-  })
+  const [storage, store] = useStorage()
 
   const tbdItems = useMemo(
     () =>
@@ -219,16 +212,16 @@ export const Agenda = <I extends Item = Item>({
 
   const allItems = useMemo(
     () => [
-      ...(options.tbd
-        ? [
-            {
-              title: `${noTimeHeader}${
-                !!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''
-              }`,
-              data: [tbdItems],
-            },
-          ]
-        : []),
+      // ...(storage?.agendaTbd
+      //   ? [
+      //       {
+      //         title: `${noTimeHeader}${
+      //           !!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''
+      //         }`,
+      //         data: [tbdItems],
+      //       },
+      //     ]
+      //   : []),
       ...datedItems.reduce(
         (arr, year) => [
           ...arr,
@@ -244,12 +237,40 @@ export const Agenda = <I extends Item = Item>({
         [] as { title: string; data: DayItems<I>[] }[]
       ),
     ],
-    [tbdItems, datedItems, options]
+    [tbdItems, datedItems, storage]
   )
 
+  const refSectionList = useRef<SectionList<
+    DayItems<I>,
+    { title: string; data: DayItems<I>[] }
+  > | null>(null)
+
+  const attemptScrollToIndex = useCallback(() => {
+    // check if there is even a list with items
+    if (allItems.length > 0 && refSectionList.current) {
+      const today = moment()
+      const monthIdx = allItems.findIndex((item) =>
+        item.title.toLowerCase().match(today.format('MMMM').toLowerCase())
+      )
+      // find current month
+      if (monthIdx >= 0) {
+        const dayIdx = allItems[monthIdx].data.findIndex(
+          (item) => parseInt(item.day) >= today.date()
+        )
+        // find current day
+        if (dayIdx >= 0) {
+          refSectionList.current.scrollToLocation({
+            sectionIndex: monthIdx,
+            itemIndex: dayIdx,
+          })
+        }
+      }
+    }
+  }, [allItems, refSectionList])
+
   return (
-    <View style={[s.flx_c]}>
-      {!!items.length && (
+    <View style={[s.flx_1, s.flx_c]}>
+      {/* {!!items.length && (
         <View style={[s.flx_r]}>
           <Checkbox
             checked={options.tbd}
@@ -257,9 +278,34 @@ export const Agenda = <I extends Item = Item>({
             label={`${noTimeHeader}${!!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''}`}
           />
         </View>
-      )}
+      )} */}
+      {!!tbdItems.items.length ? (
+        <View style={[s.flx_c]}>
+          {/* <TouchableRipple
+            onPress={() => setFieldValue('tbd', !options.tbd)}
+          >
+            <Title style={[s.c, { opacity: 0.5 }]}>{noTimeHeader}</Title>
+          </TouchableRipple> */}
+          <Button
+            icon={(props) => (
+              <Feather {...props} name={storage?.agendaTbd ? 'chevron-up' : 'chevron-down'} />
+            )}
+            onPress={() => store({ agendaTbd: !storage?.agendaTbd })}
+            labelStyle={[s.h4]}
+            contentStyle={[s.jcfs]}
+          >
+            {`${noTimeHeader}${
+              tbdItems.items.length > 0 && !storage?.agendaTbd ? ` (${tbdItems.items.length})` : ''
+            }`}
+          </Button>
+          {storage?.agendaTbd ? (
+            <Day<I> label={tbdItems.day} items={tbdItems.items} renderItem={renderItem} />
+          ) : null}
+        </View>
+      ) : null}
       {!!allItems.length ? (
         <SectionList
+          ref={refSectionList}
           sections={allItems}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
@@ -275,6 +321,8 @@ export const Agenda = <I extends Item = Item>({
           }}
           refreshing={refreshing}
           onRefresh={onRefresh}
+          onLayout={() => attemptScrollToIndex()}
+          onScrollToIndexFailed={() => console.log('o no')}
           // initialScrollIndex
         />
       ) : noItemsText ? (

@@ -38,7 +38,7 @@ export const ContactSelectScreen = ({
 
         const value = selected.some((sel) => sel === contact._id)
         return (
-          <View key={contact._id} style={[s.c, s.flx_r, s.jcsb, s.aic]}>
+          <View key={contact._id.toString()} style={[s.c, s.flx_r, s.jcsb, s.aic]}>
             <Pressable
               style={[s.flx_r, s.aic]}
               onPress={() =>
