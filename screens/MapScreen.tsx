@@ -59,6 +59,7 @@ export const MapScreen = ({ navigation }: Eventful.RN.MapStackScreenProps<'Map'>
                 }
               : undefined
           }
+          provider={PROVIDER_GOOGLE}
         ></MapView>
       ) : null}
       <View style={[{ position: 'absolute', bottom: spacing.container }, s.c]}>

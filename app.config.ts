@@ -14,18 +14,18 @@ export default {
   icon: './assets/images/icon.png',
   scheme: NODE_ENV === 'production' ? 'eventful' : 'com.xhh.eventfulMobile',
   userInterfaceStyle: 'automatic',
-  _splash: {
-    image: './assets/images/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
-  },
+  // splash: {
+  //   image: './assets/images/splash.png',
+  //   resizeMode: 'contain',
+  //   backgroundColor: '#ffffff'
+  // },
   updates: {
     fallbackToCacheTimeout: 0,
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    bundleIdentifier: 'com.xhh.eventfulMobile',
     supportsTablet: true,
-    useFrameworks: 'static',
     googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       UIBackgroundModes: ['fetch', 'remote-notification'],
@@ -61,5 +61,11 @@ export default {
   plugins: [
     '@react-native-firebase/app',
     // '@react-native-firebase/messaging'
+    ["expo-build-properties",
+    {
+      "ios": {
+        useFrameworks: 'static',
+      }
+    }]
   ],
 } as ExpoConfig

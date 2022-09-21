@@ -16,3 +16,6 @@ web-build/
 
 *.keystore
 # google-services.json
+
+*.tar.gz
+*.app
