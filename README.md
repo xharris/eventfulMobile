@@ -56,7 +56,7 @@ download artifact from https://expo.dev
 
 - download GoogleService-Info.plist
 - put it in root dir of project
-- `yarn ios -d`
+- `yarn build:ios:sim --local`
 
 # Testing a deep link
 

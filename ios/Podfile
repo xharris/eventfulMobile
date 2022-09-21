@@ -10,6 +10,9 @@ install! 'cocoapods',
   :deterministic_uuids => false
 
 target 'eventfulMobile' do
+  $static_framework = []
+  rn_maps_path = '../node_modules/react-native-maps'
+
   use_expo_modules!
 # @generated begin react-native-maps - expo prebuild (DO NOT MODIFY) sync-e9cc66c360abe50bc66d89fffb3c55b034d7d369
   pod 'react-native-google-maps', path: File.dirname(`node --print "require.resolve('react-native-maps/package.json')"`)
@@ -35,9 +38,45 @@ target 'eventfulMobile' do
   # if !ENV['CI']
   #   use_flipper!()
   # end
+  $static_framework += [
+    'react-native-maps',
+    'react-native-google-maps',
+    'Google-Maps-iOS-Utils',
+    'GoogleMaps',
+    'RNPermissions',
+    'Permission-LocationWhenInUse',
+    'Permission-Notifications',
+    'react-native-paste-input',
+    'vision-camera-code-scanner',
+    'VisionCamera'
+  ]
+
+  # pod 'react-native-google-maps', :path => rn_maps_path
+  pod 'GoogleMaps'
+  pod 'Google-Maps-iOS-Utils'
+  
+  pre_install do |installer|
+    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+        installer.pod_targets.each do |pod|
+            if $static_framework.include?(pod.name)
+                def pod.build_type;
+                Pod::BuildType.static_library # >= 1.9
+            end
+        end
+    end
+  end
 
   post_install do |installer|
     react_native_post_install(installer)
+
+    installer.pods_project.targets.each do |target|
+      if target.name == 'RCT-Folly'
+        target.build_configurations.each do |config|
+          config.build_settings['HEADER_SEARCH_PATHS'] = "$(inherited) ${PODS_ROOT}/fmt/include"
+        end
+      end
+    end
+
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
 
     # This is necessary for Xcode 14, because it signs resource bundles by default
