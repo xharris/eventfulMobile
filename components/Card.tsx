@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Pressable,
-  PressableProps,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
-  ViewProps,
-} from 'react-native'
+import { Pressable, PressableProps } from 'react-native'
 import { c, radius, s } from '../libs/styles'
 import { Shadow, ShadowProps } from 'react-native-shadow-2'
 

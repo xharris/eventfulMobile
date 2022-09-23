@@ -1,6 +1,7 @@
 import { consoleTransport, fileAsyncTransport, logger } from 'react-native-logs'
 import * as EFS from 'expo-file-system'
 import { InteractionManager } from 'react-native'
+import { Logging } from '../eventfulLib/log'
 
 const log = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
   transport: [consoleTransport, fileAsyncTransport],
@@ -13,9 +14,9 @@ const log = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
   asyncFunc: InteractionManager.runAfterInteractions,
 })
 
-export const logExtend = log.extend
-
-export const getLogs = () =>
+export const methods: Logging['methods'] = log
+export const extend: Logging['extend'] = log.extend
+export const getLogs: Logging['getLogs'] = () =>
   EFS.readAsStringAsync(`${EFS.documentDirectory}log.txt`).catch(() =>
     log.error(`${EFS.documentDirectory}log.txt not found`)
   )

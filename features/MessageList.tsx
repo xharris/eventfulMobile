@@ -34,9 +34,15 @@ const MessageItem = ({ data, prevSameUser, onContextMenu }: MessageItemProps) =>
 
 interface MessageListProps extends ViewProps {
   event?: Eventful.ID
+  mode?: 'single' | 'full'
 }
 
-export const MessageList = ({ event: eventId, style, ...props }: MessageListProps) => {
+export const MessageList = ({
+  event: eventId,
+  style,
+  mode = 'full',
+  ...props
+}: MessageListProps) => {
   const { data: messages } = useMessages({ event: eventId })
   const [{ options }, setChatCtx] = useChatCtx()
   const { data: event } = useEvent({ id: eventId })
@@ -53,14 +59,17 @@ export const MessageList = ({ event: eventId, style, ...props }: MessageListProp
     <View style={[s.c, style]} {...props}>
       {items ? (
         <FlatList
-          data={items}
-          keyExtractor={(item) => item._id}
+          data={mode === 'single' ? items.slice(0, 1) : items}
+          keyExtractor={(item) => item._id.toString()}
           contentContainerStyle={{ padding: 4 }}
           renderItem={({ item, index }) => (
             <MessageItem
               data={item}
               prevSameUser={
-                index < items.length - 1 && items[index + 1].createdBy._id === item.createdBy._id
+                mode === 'single'
+                  ? false
+                  : index < items.length - 1 &&
+                    items[index + 1].createdBy._id === item.createdBy._id
               }
               onContextMenu={() => {
                 setMessageMenuVisible(item)

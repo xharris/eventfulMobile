@@ -11,10 +11,10 @@ import {
   setNotificationHandler,
   useLastNotificationResponse,
 } from 'expo-notifications'
-import { logExtend } from './log'
 import * as Linking from 'expo-linking'
+import { extend } from '../eventfulLib/log'
 
-const log = logExtend('LIB/NOTIFICATION')
+const log = extend('LIB/NOTIFICATION')
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -29,7 +29,7 @@ const log = logExtend('LIB/NOTIFICATION')
 // }
 
 messaging().setBackgroundMessageHandler(async (msg) => {
-  console.log(msg)
+  log.info('bg message', msg)
 })
 
 export const requestPermission = () =>
@@ -51,13 +51,13 @@ export const useMessaging = () => {
     messaging()
       .getToken()
       .then((token) => {
-        console.log('token', token)
+        log.info('token', token)
         return api.post('fcm', { token })
       })
       .catch((err) => console.log(err))
 
     const unsub = messaging().onMessage((payload) => {
-      console.log('foreground message', payload)
+      log.info('fg message', payload)
     })
     return () => {
       unsub()

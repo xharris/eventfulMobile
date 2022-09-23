@@ -13,7 +13,7 @@ import { ContactsScreen } from './screens/ContactsScreen'
 import { EventScreen } from './screens/EventScreen'
 import { NotificationSettingScreen } from './screens/NotificationSettingScreen'
 import { PlanEditScreen } from './screens/PlanEditScreen'
-import { c, useAnimatedValue } from './libs/styles'
+import { c, radius, useAnimatedValue } from './libs/styles'
 import { ContactSelectScreen } from './screens/ContactSelect'
 import { StatusBar } from 'expo-status-bar'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
@@ -32,10 +32,10 @@ import { ReminderEditScreen } from './screens/ReminderEditScreen'
 import moment from 'moment-timezone'
 import { useReminderScheduler } from './eventfulLib/reminder'
 import { DevScreen } from './screens/DevScreen'
-import { logExtend } from './libs/log'
+import { extend } from './eventfulLib/log'
 import { parse, useURL } from 'expo-linking'
 
-const log = logExtend('APP')
+const log = extend('APP')
 
 moment.tz.setDefault()
 
@@ -252,11 +252,12 @@ export default function App() {
       <Provider
         theme={{
           ...DefaultPaperTheme,
+          roundness: radius.normal,
           colors: {
             ...DefaultPaperTheme.colors,
             primary: c.oneDark,
             accent: c.twoDark,
-            background: c.bg,
+            background: '#ECEFF1', // , c.bg,
             surface: c.surf,
             text: c.onBg,
             onSurface: c.onSurf,

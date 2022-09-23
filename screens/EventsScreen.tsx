@@ -15,7 +15,7 @@ import { Time } from '../components/Time'
 import { useEvents } from '../eventfulLib/event'
 import { useSession } from '../eventfulLib/session'
 import { Agenda } from '../features/Agenda'
-import { s } from '../libs/styles'
+import { c, radius, s } from '../libs/styles'
 
 const Event = ({
   event,
@@ -24,15 +24,25 @@ const Event = ({
   event: Eventful.API.EventGet
   onPress: PressableProps['onPress']
 }) => (
-  <Card
-    shadowProps={{
-      style: [s.ass],
+  <Pressable
+    // shadowProps={{
+    //   style: [s.ass],
+    // }}
+    android_ripple={{
+      color: c.oneDark,
     }}
-    style={[s.flx_r, s.jcsb, s.aic]}
+    style={[
+      s.flx_r,
+      s.jcsb,
+      s.aic,
+      {
+        borderRadius: radius.normal,
+      },
+    ]}
     onPress={onPress}
   >
     <View style={[s.flx_c]}>
-      <H5 style={[s.bold]}>{event.name}</H5>
+      <H5 style={[s.bold]}>{event.name.length > 0 ? event.name : '(Untitled event)'}</H5>
       <Time time={event.time} />
     </View>
     <AvatarGroup
@@ -40,7 +50,7 @@ const Event = ({
         username: user.username,
       }))}
     />
-  </Card>
+  </Pressable>
 )
 
 export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
@@ -55,7 +65,7 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
   }, [navigation])
 
   return (
-    <SafeAreaView style={[s.c, { flex: 1 }]}>
+    <SafeAreaView style={[s.c, { flex: 1, backgroundColor: c.bg }]}>
       <View style={[s.flx_r, s.aic]}>
         <TextInput
           style={[s.flx_1]}
@@ -100,7 +110,6 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
             }
           />
         )}
-        renderOnEveryDay={false}
         refreshing={isRefetching}
         onRefresh={() => refetch()}
       />

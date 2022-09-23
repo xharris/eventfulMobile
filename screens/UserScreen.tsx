@@ -22,17 +22,17 @@ import {
   TextInput,
 } from 'react-native-paper'
 import { useNavigationState } from '@react-navigation/native'
-import { getLogs, logExtend } from '../libs/log'
 import { useStorage } from '../libs/storage'
 import { useSnackbar } from '../components/Snackbar'
 import { useFormik } from 'formik'
 import { FEEDBACK, useFeedback } from '../eventfulLib/feedback'
+import { extend, getLogs } from '../eventfulLib/log'
 
-const log = logExtend('USER')
+const log = extend('USER')
 
 export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
   const { user } = route.params
-  const { data } = useUser({ id: user.toString() })
+  const { data } = useUser({ id: user?.toString() })
   const { session, logOut } = useSession()
   const { data: contacts, addContact, removeContact } = useContacts({ user: session?._id })
   const [devPresses, setDevPresses] = useState(0)
@@ -52,7 +52,7 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
     onSubmit: async (values, { resetForm }) => {
       setShowFeedback(false)
       let logs = ''
-      if (values.logs) {
+      if (values.logs && getLogs) {
         logs = (await getLogs()) ?? ''
       }
       sendFeedback({
@@ -232,18 +232,26 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
                   label="Feedback"
                   defaultValue={feedbackForm.values.text}
                   onChangeText={(v) => feedbackForm.setFieldValue('text', v)}
+                  maxLength={500}
+                  right={
+                    <TextInput.Affix text={(500 - feedbackForm.values.text.length).toString()} />
+                  }
                   multiline
                 />
                 <Spacer />
-                <List.Item
-                  title="Include logs"
-                  right={() => (
-                    <Checkbox
-                      status={feedbackForm.values.logs ? 'checked' : 'unchecked'}
-                      onPress={() => feedbackForm.setFieldValue('logs', !feedbackForm.values.logs)}
-                    />
-                  )}
-                />
+                {getLogs ? (
+                  <List.Item
+                    title="Include logs"
+                    right={() => (
+                      <Checkbox
+                        status={feedbackForm.values.logs ? 'checked' : 'unchecked'}
+                        onPress={() =>
+                          feedbackForm.setFieldValue('logs', !feedbackForm.values.logs)
+                        }
+                      />
+                    )}
+                  />
+                ) : null}
               </ScrollView>
             </Dialog.ScrollArea>
           </Dialog.Content>

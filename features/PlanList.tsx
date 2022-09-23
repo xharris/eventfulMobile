@@ -15,12 +15,16 @@ interface PlanListProps extends ViewProps {
   event?: Eventful.ID
   onPlanPress: (id: Eventful.ID) => void
   onPlanAdd: (body: Eventful.API.PlanAdd) => void
+  expanded?: boolean
+  onExpandChange?: () => void
 }
 
 export const PlanList = ({
   event: eventId,
   onPlanPress,
   onPlanAdd,
+  expanded,
+  onExpandChange,
   style,
   ...props
 }: PlanListProps) => {
@@ -101,6 +105,16 @@ export const PlanList = ({
       )}
       {!!items?.length ? (
         <View style={[s.flx_r, s.jcsb]}>
+          {onExpandChange ? (
+            <IconButton
+              icon={(props) => (
+                <Feather {...props} name={expanded ? 'chevron-up' : 'chevron-down'} />
+              )}
+              onPress={onExpandChange}
+            />
+          ) : (
+            <Spacer />
+          )}
           <Spacer />
           <IconButton
             icon={(props) => <Feather name="plus" {...props} />}
