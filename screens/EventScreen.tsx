@@ -1,39 +1,33 @@
 import Feather from '@expo/vector-icons/Feather'
 import { useFormik } from 'formik'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlatList, VirtualizedList, Text, View, Keyboard, Dimensions } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { View } from 'react-native'
 import { Eventful } from 'types'
 import { Button } from '../components/Button'
-import { Checkbox, getOnCheckboxColor } from '../components/Checkbox'
-import { H3, H4, H5, H6 } from '../components/Header'
+import { H5 } from '../components/Header'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
 import { useEvent } from '../eventfulLib/event'
 import { useMessages } from '../eventfulLib/message'
 import { useSession } from '../eventfulLib/session'
-import { Message } from '../features/Message'
-import { Plan } from '../features/Plan'
-import { c, s, spacing } from '../libs/styles'
-import { Dialog, FAB, IconButton, Menu, Portal } from 'react-native-paper'
-import createStateContext from 'react-use/lib/factory/createStateContext'
-import { CommonActions, CompositeScreenProps, useNavigation } from '@react-navigation/native'
+import { c, s } from '../libs/styles'
+import { Dialog, IconButton, Menu } from 'react-native-paper'
+import { useNavigation } from '@react-navigation/native'
 import { useStorage } from '../libs/storage'
-import { CATEGORY_INFO, usePlans } from '../eventfulLib/plan'
-import { CATEGORY_ICON } from '../libs/plan'
-import { Modal } from '../components/Modal'
+import { usePlans } from '../eventfulLib/plan'
 import { AreYouSure } from '../libs/dialog'
 import { MessageList } from '../features/MessageList'
 import { PlanList } from '../features/PlanList'
 import { ChatCtxProvider, useChatCtx } from '../features/ChatCtx'
-import { logExtend } from '../libs/log'
+import { extend } from '../eventfulLib/log'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-const log = logExtend('EVENTSCREEN')
+const log = extend('EVENTSCREEN')
 
 const EventInput = ({ event }: { event: Eventful.ID }) => {
   const [text, setText] = useState('')
   const { addMessage, updateMessage } = useMessages({ event })
   const [{ options, editing, replying }, setChatCtx] = useChatCtx()
-  const navigation = useNavigation<Eventful.RN.EventStackScreenProps<'Event'>['navigation']>()
 
   const submitMessage = useCallback(() => {
     if (editing) {
@@ -131,9 +125,10 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
     },
   })
   const [menuVisible, setMenuVisible] = useState(false)
-  const [_, store] = useStorage()
+  const [storage, store] = useStorage()
   const [showTitleEdit, setShowTitleEdit] = useState(false)
   const { addPlan } = usePlans({ event: eventId })
+  const [chatCollapsed, setChatCollapsed] = useState(false)
 
   useEffect(() => {
     if (eventId && event?.name) {
@@ -197,7 +192,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
 
   return (
     <ChatCtxProvider>
-      <View style={[s.flx_c, s.flx_1]}>
+      <SafeAreaView style={[s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
         <PlanList
           style={[s.flx_1]}
           event={eventId}
@@ -205,10 +200,20 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
           onPlanAdd={(body) =>
             addPlan(body).then((res) => navigation.push('PlanEdit', { plan: res.data._id }))
           }
+          expanded={storage?.messagesCollapsed}
+          onExpandChange={() =>
+            store({
+              messagesCollapsed: !storage?.messagesCollapsed,
+            })
+          }
         />
-        <MessageList event={eventId} style={[s.flx_1]} />
-        <EventInput event={eventId} />
-      </View>
+        <MessageList
+          event={eventId}
+          style={storage?.messagesCollapsed ? null : [s.flx_1]}
+          mode={storage?.messagesCollapsed ? 'single' : 'full'}
+        />
+        {!storage?.messagesCollapsed ? <EventInput event={eventId} /> : null}
+      </SafeAreaView>
       <Dialog visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
         <Dialog.Content>
           <TextInput

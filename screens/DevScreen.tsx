@@ -15,7 +15,9 @@ export const DevScreen = ({}: Eventful.RN.UserStackScreenProps<'Dev'>) => {
 
   const fetchEverything = async () => {
     await getScheduledNotifications().then((notifs) => setSchedNotifs(notifs))
-    await getLogs().then((logs) => setLogs(logs ?? ''))
+    if (getLogs) {
+      await getLogs().then((logs) => setLogs(logs ?? ''))
+    }
   }
 
   useEffect(() => {

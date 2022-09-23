@@ -1,17 +1,16 @@
-import { useFormik } from 'formik'
 import moment from 'moment-timezone'
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from 'react'
-import { Checkbox } from '../components/Checkbox'
-import { SectionList, View, Text } from 'react-native'
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { SectionList, View, Text, useWindowDimensions } from 'react-native'
 import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
 import { c, s, spacing } from '../libs/styles'
 import { Spacer } from '../components/Spacer'
-import { Button, Headline, Subheading, Title, TouchableRipple } from 'react-native-paper'
+import { Badge, Chip, Title } from 'react-native-paper'
 import Feather from '@expo/vector-icons/Feather'
 import { useStorage } from '../libs/storage'
+import { extend } from '../eventfulLib/log'
 
-// TODO: show past days with less opacity
+const log = extend('AGENDA')
 
 interface Item {
   _id: Eventful.ID
@@ -22,6 +21,7 @@ interface Item {
 interface DayItems<I extends Item> {
   key: string
   day: string
+  dayOfWeek: string
   items: I[]
 }
 
@@ -88,24 +88,55 @@ const Month = <I extends Item = Item>({ label, days, renderItem }: MonthProps<I>
 
 interface DayProps<I extends Item> {
   label: string
+  dayOfWeek?: string
+  isOld?: boolean
   items: I[]
   renderItem: (item: I) => ReactNode
 }
 
-const Day = <I extends Item = Item>({ label, items, renderItem }: DayProps<I>) => (
-  <View style={[s.flx_r]}>
-    <Headline
-      style={{
-        minWidth: 50,
-        marginTop: 12,
-        opacity: 0.3,
-        textAlign: 'center',
-      }}
+const Day = <I extends Item = Item>({
+  label,
+  dayOfWeek,
+  isOld,
+  items,
+  renderItem,
+}: DayProps<I>) => (
+  <View style={[s.c, s.flx_r]}>
+    <View
+      style={[
+        // s.c,
+        s.aic,
+        {
+          opacity: 0.4,
+        },
+      ]}
     >
-      {label}
-    </Headline>
+      {dayOfWeek ? (
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: 15,
+            padding: 0,
+            margin: 0,
+          }}
+        >
+          {dayOfWeek}
+        </Text>
+      ) : null}
+      <Text
+        style={{
+          minWidth: 50,
+          textAlign: 'center',
+          padding: 0,
+          marginHorizontal: 0,
+          fontSize: 20,
+        }}
+      >
+        {label}
+      </Text>
+    </View>
     <Spacer size={spacing.normal} />
-    <View style={[s.flx_c, s.flx_1]}>
+    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1 }]}>
       {items.map((item) => (
         <View key={item._id.toString()} style={[s.ass, s.ais, { marginBottom: spacing.normal }]}>
           {renderItem(item)}
@@ -143,7 +174,10 @@ export const Agenda = <I extends Item = Item>({
   onRefresh,
   refreshing,
 }: AgendaProps<I>) => {
-  const [storage, store] = useStorage()
+  const [storage, store] = useStorage({ agendaView: 'agenda' })
+  const [loaded, setLoaded] = useState(false)
+  const [isUserScroll, setIsUserScroll] = useState(false)
+  // TODO add TODAY button that resets this to false
 
   const tbdItems = useMemo(
     () =>
@@ -203,6 +237,8 @@ export const Agenda = <I extends Item = Item>({
               .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
               .map(([day, items]) => ({
                 key: `${year}-${month}-${day}`,
+                dayOfWeek: moment(`${year}-${month}-${day}`, 'YYYY-MMMM-DD').format('ddd'),
+                isOld: moment(`${year}-${month}-${day}`, 'YYYY-MMMM-DD').isBefore(new Date()),
                 day,
                 items,
               })),
@@ -246,85 +282,118 @@ export const Agenda = <I extends Item = Item>({
   > | null>(null)
 
   const attemptScrollToIndex = useCallback(() => {
+    if (!refSectionList.current) {
+      return
+    }
+    if (storage?.agendaScrollY != null) {
+      // const { agendaScrollY } = storage
+      // log.info(`scroll to y=${agendaScrollY}`)
+      // refSectionList.current.scrollToLocation({
+      //   animated: false,
+      //   sectionIndex: 0,
+      //   itemIndex: 0,
+      //   viewOffset: agendaScrollY,
+      // })
+      // return
+    }
     // check if there is even a list with items
-    if (allItems.length > 0 && refSectionList.current) {
+    if (allItems.length > 0) {
       const today = moment()
       const monthIdx = allItems.findIndex((item) =>
         item.title.toLowerCase().match(today.format('MMMM').toLowerCase())
       )
+      log.info(`scroll to ${today.format('l')}`)
+      log.info(`- month ${monthIdx}`)
       // find current month
       if (monthIdx >= 0) {
         const dayIdx = allItems[monthIdx].data.findIndex(
-          (item) => parseInt(item.day) >= today.date()
+          (item, i) =>
+            parseInt(item.day) >= today.date() || i === allItems[monthIdx].data.length - 1
         )
+        log.info(`- day ${dayIdx}`)
         // find current day
         if (dayIdx >= 0) {
           refSectionList.current.scrollToLocation({
+            animated: false,
             sectionIndex: monthIdx,
             itemIndex: dayIdx,
           })
         }
       }
     }
-  }, [allItems, refSectionList])
+  }, [allItems, refSectionList, storage, isUserScroll])
+
+  const { height } = useWindowDimensions()
 
   return (
     <View style={[s.flx_1, s.flx_c]}>
-      {/* {!!items.length && (
-        <View style={[s.flx_r]}>
-          <Checkbox
-            checked={options.tbd}
-            onChange={(v) => setFieldValue('tbd', v)}
-            label={`${noTimeHeader}${!!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''}`}
-          />
-        </View>
-      )} */}
-      {!!tbdItems.items.length ? (
-        <View style={[s.flx_c]}>
-          {/* <TouchableRipple
-            onPress={() => setFieldValue('tbd', !options.tbd)}
+      <View style={[s.flx_r, s.aic]}>
+        <View>
+          <Chip
+            selected={storage?.agendaView === 'tbd'}
+            icon={(props) => <Feather {...props} name="help-circle" />}
+            onPress={() => store({ agendaView: 'tbd' })}
           >
-            <Title style={[s.c, { opacity: 0.5 }]}>{noTimeHeader}</Title>
-          </TouchableRipple> */}
-          <Button
-            icon={(props) => (
-              <Feather {...props} name={storage?.agendaTbd ? 'chevron-up' : 'chevron-down'} />
-            )}
-            onPress={() => store({ agendaTbd: !storage?.agendaTbd })}
-            labelStyle={[s.h4]}
-            contentStyle={[s.jcfs]}
-          >
-            {`${noTimeHeader}${
-              tbdItems.items.length > 0 && !storage?.agendaTbd ? ` (${tbdItems.items.length})` : ''
-            }`}
-          </Button>
-          {storage?.agendaTbd ? (
-            <Day<I> label={tbdItems.day} items={tbdItems.items} renderItem={renderItem} />
+            {noTimeHeader}
+          </Chip>
+          {!!tbdItems.items.length ? (
+            <Badge
+              style={{
+                position: 'absolute',
+                right: -4,
+                top: -4,
+                // zIndex: 1000,
+              }}
+            >
+              {tbdItems.items.length}
+            </Badge>
           ) : null}
         </View>
-      ) : null}
+        <Spacer />
+        <Chip
+          icon={(props) => <Feather {...props} name="list" />}
+          selected={storage?.agendaView === 'agenda'}
+          onPress={() => store({ agendaView: 'agenda' })}
+        >
+          Agenda
+        </Chip>
+      </View>
+      <Spacer />
       {!!allItems.length ? (
-        <SectionList
-          ref={refSectionList}
-          sections={allItems}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <Day<I> label={item.day} items={item.items} renderItem={renderItem} />
-          )}
-          renderSectionHeader={({ section }) => (
-            <Title style={[s.c, { opacity: 0.5 }]}>{section.title}</Title>
-          )}
-          // SectionSeparatorComponent={() => <H5>hi</H5>}
-          stickySectionHeadersEnabled
-          contentContainerStyle={{
-            padding: 4,
-          }}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          onLayout={() => attemptScrollToIndex()}
-          onScrollToIndexFailed={() => console.log('o no')}
-          // initialScrollIndex
-        />
+        storage?.agendaView === 'tbd' ? (
+          <Day<I> label={tbdItems.day} items={tbdItems.items} renderItem={renderItem} />
+        ) : storage?.agendaView === 'agenda' ? (
+          <SectionList
+            ref={refSectionList}
+            sections={allItems}
+            keyExtractor={(item) => item.key}
+            renderItem={({ item }) => <Day<I> label={item.day} {...item} renderItem={renderItem} />}
+            renderSectionHeader={({ section }) => (
+              <View style={[s.c, { backgroundColor: c.bg }]}>
+                <Title>{section.title}</Title>
+              </View>
+            )}
+            ListFooterComponent={() => <View style={[{ height }]} />}
+            stickySectionHeadersEnabled
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            onLayout={() => {
+              attemptScrollToIndex()
+              setLoaded(true)
+            }}
+            onScrollToIndexFailed={(e) => log.error(`scrollToIndexFailed ${e}`)}
+            onScrollEndDrag={(e) => {
+              setIsUserScroll(true)
+            }}
+            onMomentumScrollEnd={(e) => {
+              if (isUserScroll) {
+                store({ agendaScrollY: e.nativeEvent.contentOffset.y })
+                setIsUserScroll(false)
+              }
+            }}
+            scrollEventThrottle={400}
+          />
+        ) : null
       ) : noItemsText ? (
         <H1 style={{ color: '$disabled', fontStyle: 'italic', textAlign: 'center' }}>
           {noItemsText}

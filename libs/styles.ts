@@ -56,7 +56,7 @@ export const c = {
   twoDark: '#00a2ba',
   oneVariant: '',
   twoVariant: '',
-  bg: '#FFFFFF',
+  bg: '#FAFAFA', // '#f6f6f6',
   surf: '#FFFFFF',
   err: '#B00020',
   onOneLight: '#263238',
