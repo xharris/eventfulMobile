@@ -24,6 +24,8 @@ export default {
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    // major.rev.minor
+    buildNumber: '1.0.0',
     bundleIdentifier: 'com.xhh.eventfulMobile',
     supportsTablet: true,
     googleServicesFile: './GoogleService-Info.plist',
@@ -36,6 +38,7 @@ export default {
     },
   },
   android: {
+    versionCode: 1,
     package: 'com.xhh.eventfulMobile',
     googleServicesFile: './google-services.json',
     adaptiveIcon: {
@@ -61,11 +64,13 @@ export default {
   plugins: [
     '@react-native-firebase/app',
     // '@react-native-firebase/messaging'
-    ["expo-build-properties",
-    {
-      "ios": {
-        useFrameworks: 'static',
-      }
-    }]
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          useFrameworks: 'static',
+        },
+      },
+    ],
   ],
 } as ExpoConfig

@@ -62,6 +62,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               autoCapitalize="none"
               autoFocus={true}
             />
+            <Spacer />
             <TextInput
               placeholder="Password"
               value={values.password}
@@ -71,6 +72,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               autoCapitalize="none"
               textContentType="newPassword"
             />
+            <Spacer />
             <TextInput
               placeholder="Confirm Password"
               value={values.confirm_password}
@@ -92,6 +94,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               textContentType="username"
               autoFocus={true}
             />
+            <Spacer />
             <TextInput
               placeholder="Password"
               value={values.password}

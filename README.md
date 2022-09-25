@@ -45,7 +45,7 @@ OR
 comment `google-services.json` in .gitignore 
 
 ```
-yarn build --local
+yarn build:android
 ```
 
 download artifact from https://expo.dev
