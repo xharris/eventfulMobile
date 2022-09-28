@@ -325,6 +325,10 @@ export const Agenda = <I extends Item = Item>({
 
   const { height } = useWindowDimensions()
 
+  useEffect(() => {
+    console.log(loaded)
+  }, [loaded])
+
   return (
     <View style={[s.flx_1, s.flx_c]}>
       <View style={[s.flx_r, s.aic]}>
@@ -369,7 +373,7 @@ export const Agenda = <I extends Item = Item>({
             keyExtractor={(item) => item.key}
             renderItem={({ item }) => <Day<I> label={item.day} {...item} renderItem={renderItem} />}
             renderSectionHeader={({ section }) => (
-              <View style={[s.c, { backgroundColor: c.bg }]}>
+              <View style={[s.c, s.aife, { backgroundColor: c.bg }]}>
                 <Title>{section.title}</Title>
               </View>
             )}

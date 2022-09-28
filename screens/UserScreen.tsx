@@ -45,7 +45,7 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
 
   const feedbackForm = useFormik({
     initialValues: {
-      type: 'question',
+      type: 'question' as Eventful.API.FeedbackEdit['type'],
       text: '',
       logs: false,
     },
@@ -136,6 +136,14 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
               icon={(props) => <Feather {...props} name="users" />}
             >
               Contacts
+            </Button>
+            <Spacer />
+            <Button
+              mode="outlined"
+              onPress={() => navigation.push('Tags', { user })}
+              icon={(props) => <Feather {...props} name="box" />}
+            >
+              Tags
             </Button>
             <Spacer />
             <Button

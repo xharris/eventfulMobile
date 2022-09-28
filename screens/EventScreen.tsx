@@ -3,7 +3,6 @@ import { useFormik } from 'formik'
 import React, { useCallback, useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Eventful } from 'types'
-import { Button } from '../components/Button'
 import { H5 } from '../components/Header'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
@@ -11,7 +10,7 @@ import { useEvent } from '../eventfulLib/event'
 import { useMessages } from '../eventfulLib/message'
 import { useSession } from '../eventfulLib/session'
 import { c, s } from '../libs/styles'
-import { Dialog, IconButton, Menu } from 'react-native-paper'
+import { Button, Caption, Dialog, IconButton, Menu, Subheading, Text } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { useStorage } from '../libs/storage'
 import { usePlans } from '../eventfulLib/plan'
@@ -21,6 +20,7 @@ import { PlanList } from '../features/PlanList'
 import { ChatCtxProvider, useChatCtx } from '../features/ChatCtx'
 import { extend } from '../eventfulLib/log'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { TagList } from '../features/TagList'
 
 const log = extend('EVENTSCREEN')
 
@@ -128,7 +128,6 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   const [storage, store] = useStorage()
   const [showTitleEdit, setShowTitleEdit] = useState(false)
   const { addPlan } = usePlans({ event: eventId })
-  const [chatCollapsed, setChatCollapsed] = useState(false)
 
   useEffect(() => {
     if (eventId && event?.name) {
@@ -144,17 +143,9 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <Button
-          title={event?.name}
-          icon={() => (
-            <Feather
-              name="edit-2"
-              size={s.h5.fontSize}
-              style={{ color: c.oneDark, opacity: 0.5 }}
-            />
-          )}
-          onPress={() => setShowTitleEdit(true)}
-        />
+        <Button onPress={() => setShowTitleEdit(true)} mode="outlined">
+          <Subheading>{event?.name}</Subheading>
+        </Button>
       ),
       headerRight: () => (
         <Menu
@@ -176,6 +167,14 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
             }}
           />
           <Menu.Item
+            icon={(props) => <Feather {...props} name="settings" />}
+            title="Settings"
+            onPress={() => {
+              setMenuVisible(false)
+              navigation.push('EventSetting', { event: eventId })
+            }}
+          />
+          <Menu.Item
             icon={({ size, color }) => <Feather name="trash-2" size={size} color={c.err} />}
             title="Delete"
             onPress={() => {
@@ -193,8 +192,9 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
   return (
     <ChatCtxProvider>
       <SafeAreaView style={[s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
+        <TagList style={[s.c]} tags={event?.tags ?? []} />
         <PlanList
-          style={[s.flx_1]}
+          style={[s.c, s.flx_1]}
           event={eventId}
           onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
           onPlanAdd={(body) =>
@@ -223,15 +223,16 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
           />
         </Dialog.Content>
         <Dialog.Actions>
-          <Button title="Cancel" onPress={() => setShowTitleEdit(false)} />
+          <Button onPress={() => setShowTitleEdit(false)}>Cancel</Button>
           <Button
-            title="Save"
             disabled={!dirty}
             onPress={() => {
               setShowTitleEdit(false)
               submitForm()
             }}
-          />
+          >
+            Save
+          </Button>
         </Dialog.Actions>
       </Dialog>
     </ChatCtxProvider>

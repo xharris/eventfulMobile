@@ -25,7 +25,6 @@ export const PlanList = ({
   onPlanAdd,
   expanded,
   onExpandChange,
-  style,
   ...props
 }: PlanListProps) => {
   const { data: event } = useEvent({ id: eventId })
@@ -49,7 +48,7 @@ export const PlanList = ({
   )
 
   return (
-    <View style={[s.c, style]} {...props}>
+    <View {...props}>
       <View style={[s.flx_r]}>
         <View
           style={[

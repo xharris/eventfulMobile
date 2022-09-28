@@ -34,6 +34,9 @@ import { useReminderScheduler } from './eventfulLib/reminder'
 import { DevScreen } from './screens/DevScreen'
 import { extend } from './eventfulLib/log'
 import { parse, useURL } from 'expo-linking'
+import { EventSettingScreen } from './screens/EventSettingScreen'
+import { TagScreen } from './screens/TagScreen'
+import { TagsScreen } from './screens/TagsScreen'
 
 const log = extend('APP')
 
@@ -199,6 +202,7 @@ const AppNav = () => {
             <EventStack.Screen name="PlanEdit" component={PlanEditScreen} />
             <EventStack.Screen name="ContactSelect" component={ContactSelectScreen} />
             <EventStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
+            <EventStack.Screen name="EventSetting" component={EventSettingScreen} />
           </EventStack.Navigator>
         )}
       </BottomTabs.Screen>
@@ -229,6 +233,8 @@ const AppNav = () => {
               component={DevScreen}
               options={{ title: 'WTF is going on' }}
             />
+            <UserStack.Screen name="Tag" component={TagScreen} />
+            <UserStack.Screen name="Tags" component={TagsScreen} />
           </UserStack.Navigator>
         )}
       </BottomTabs.Screen>
