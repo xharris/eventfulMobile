@@ -30,7 +30,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               if (res && res.status < 300) {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'App' }],
+                  routes: [{ name: 'Main' }],
                 })
               }
             })
@@ -40,7 +40,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               if (res && res.status < 300) {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'App' }],
+                  routes: [{ name: 'Main' }],
                 })
               }
             })

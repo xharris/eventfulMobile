@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import {
   Button,
+  Caption,
   Dialog,
   FAB,
   List,
@@ -22,7 +23,7 @@ import { c, s } from '../libs/styles'
 
 const log = extend('tagsscreen')
 
-export const TagsScreen = ({ navigation }: Eventful.RN.UserStackScreenProps<'Tags'>) => {
+export const TagsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Tags'>) => {
   const { session } = useSession()
   const { data, isFetching, addTag } = useTags({ user: session?._id })
   const [addTagName, setAddTagName] = useState('')
@@ -40,7 +41,7 @@ export const TagsScreen = ({ navigation }: Eventful.RN.UserStackScreenProps<'Tag
             key={tag._id.toString()}
             onPress={() => navigation.push('Tag', { tag: tag._id })}
             title={tag.name ?? 'Untitled tag'}
-            description={tag.createdBy.username}
+            description={`${tag.createdBy.username}, ${tag.events.length} events`}
           />
         ))}
       </View>

@@ -111,7 +111,7 @@ const EventInput = ({ event }: { event: Eventful.ID }) => {
   )
 }
 
-export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenProps<'Event'>) => {
+export const EventScreen = ({ navigation, route }: Eventful.RN.MainStackScreenProps<'Event'>) => {
   const { event: eventId } = route.params
   const { data: event, error, updateEvent, deleteEvent } = useEvent({ id: eventId })
   const { session } = useSession()
@@ -144,7 +144,11 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.EventStackScreenP
     navigation.setOptions({
       headerTitle: () => (
         <Button onPress={() => setShowTitleEdit(true)} mode="outlined">
-          <Subheading>{event?.name}</Subheading>
+          <Subheading>
+            {event?.name && event?.name.length >= 27
+              ? `${event?.name.slice(0, 27)}...`
+              : event?.name}
+          </Subheading>
         </Button>
       ),
       headerRight: () => (

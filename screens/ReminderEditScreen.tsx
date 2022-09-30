@@ -76,7 +76,7 @@ const Reminder = ({ reminder }: ReminderProps) => {
 
 export const ReminderEditScreen = ({
   navigation,
-}: Eventful.RN.UserStackScreenProps<'ReminderEdit'>) => {
+}: Eventful.RN.MainStackScreenProps<'ReminderEdit'>) => {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '',

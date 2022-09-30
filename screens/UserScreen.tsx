@@ -30,7 +30,7 @@ import { extend, getLogs } from '../eventfulLib/log'
 
 const log = extend('USER')
 
-export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
+export const UserScreen = ({ navigation, route }: Eventful.RN.MainStackScreenProps<'User'>) => {
   const { user } = route.params
   const { data } = useUser({ id: user?.toString() })
   const { session, logOut } = useSession()

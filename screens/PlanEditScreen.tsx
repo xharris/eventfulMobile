@@ -28,7 +28,7 @@ import { ContactSelectEvent } from './ContactSelect'
 export const PlanEditScreen = ({
   navigation,
   route,
-}: Eventful.RN.EventStackScreenProps<'PlanEdit'>) => {
+}: Eventful.RN.MainStackScreenProps<'PlanEdit'>) => {
   const { plan: planId } = route.params
   const { data: plan, updatePlan, deletePlan, isFetching, isRefetching } = usePlan({ plan: planId })
   const [menuVisible, setMenuVisible] = useState(false)

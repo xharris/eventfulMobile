@@ -9,7 +9,7 @@ import { useHeaderHeight } from '@react-navigation/elements'
 import { Button } from '../components/Button'
 import imgPing from '../assets/images/ping.png'
 
-export const MapScreen = ({ navigation }: Eventful.RN.MapStackScreenProps<'Map'>) => {
+export const MapScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Map'>) => {
   const [location, setLocation] = useState<Location.LocationObject>()
   const [ready, setReady] = useState(false)
   useEffect(() => {

@@ -1,6 +1,6 @@
 import moment from 'moment-timezone'
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SectionList, View, Text, useWindowDimensions } from 'react-native'
+import { SectionList, View, Text, useWindowDimensions, ViewProps } from 'react-native'
 import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
 import { c, s, spacing } from '../libs/styles'
@@ -136,9 +136,12 @@ const Day = <I extends Item = Item>({
       </Text>
     </View>
     <Spacer size={spacing.normal} />
-    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1 }]}>
+    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1, marginTop: 10 }]}>
       {items.map((item) => (
-        <View key={item._id.toString()} style={[s.ass, s.ais, { marginBottom: spacing.normal }]}>
+        <View
+          key={item._id.toString()}
+          style={[s.ass, s.ais, { marginBottom: spacing.normal, padding: 2 }]}
+        >
           {renderItem(item)}
         </View>
       ))}
@@ -151,7 +154,7 @@ interface AgendaOptions {
   tbd: boolean
 }
 
-interface AgendaProps<I extends Item> {
+interface AgendaProps<I extends Item> extends ViewProps {
   items?: I[]
   noTimeHeader: string
   noTimeSubheader?: string
@@ -173,6 +176,8 @@ export const Agenda = <I extends Item = Item>({
   renderOnEveryDay = true,
   onRefresh,
   refreshing,
+  style,
+  ...props
 }: AgendaProps<I>) => {
   const [storage, store] = useStorage({ agendaView: 'agenda' })
   const [loaded, setLoaded] = useState(false)
@@ -248,23 +253,9 @@ export const Agenda = <I extends Item = Item>({
 
   const allItems = useMemo(
     () => [
-      // ...(storage?.agendaTbd
-      //   ? [
-      //       {
-      //         title: `${noTimeHeader}${
-      //           !!tbdItems.items.length ? ` (${tbdItems.items.length})` : ''
-      //         }`,
-      //         data: [tbdItems],
-      //       },
-      //     ]
-      //   : []),
       ...datedItems.reduce(
         (arr, year) => [
           ...arr,
-          // {
-          //   title: year.year,
-          //   data: [],
-          // },
           ...year.months.map((month) => ({
             title: month.month,
             data: month.days,
@@ -273,7 +264,7 @@ export const Agenda = <I extends Item = Item>({
         [] as { title: string; data: DayItems<I>[] }[]
       ),
     ],
-    [tbdItems, datedItems, storage]
+    [datedItems]
   )
 
   const refSectionList = useRef<SectionList<
@@ -326,11 +317,11 @@ export const Agenda = <I extends Item = Item>({
   const { height } = useWindowDimensions()
 
   useEffect(() => {
-    console.log(loaded)
+    log.debug('loaded', loaded)
   }, [loaded])
 
   return (
-    <View style={[s.flx_1, s.flx_c]}>
+    <View style={[s.flx_1, s.flx_c, style]} {...props}>
       <View style={[s.flx_r, s.aic]}>
         <View>
           <Chip
@@ -363,7 +354,7 @@ export const Agenda = <I extends Item = Item>({
         </Chip>
       </View>
       <Spacer />
-      {!!allItems.length ? (
+      {!!allItems.length || !!tbdItems.items.length ? (
         storage?.agendaView === 'tbd' ? (
           <Day<I> label={tbdItems.day} items={tbdItems.items} renderItem={renderItem} />
         ) : storage?.agendaView === 'agenda' ? (
@@ -373,8 +364,10 @@ export const Agenda = <I extends Item = Item>({
             keyExtractor={(item) => item.key}
             renderItem={({ item }) => <Day<I> label={item.day} {...item} renderItem={renderItem} />}
             renderSectionHeader={({ section }) => (
-              <View style={[s.c, s.aife, { backgroundColor: c.bg }]}>
-                <Title>{section.title}</Title>
+              <View style={[s.aife]}>
+                <View style={[s.ctrl, { backgroundColor: c.bg }]}>
+                  <Title>{section.title}</Title>
+                </View>
               </View>
             )}
             ListFooterComponent={() => <View style={[{ height }]} />}
@@ -385,7 +378,7 @@ export const Agenda = <I extends Item = Item>({
               attemptScrollToIndex()
               setLoaded(true)
             }}
-            onScrollToIndexFailed={(e) => log.error(`scrollToIndexFailed ${e}`)}
+            onScrollToIndexFailed={(e) => log.error(`scrollToIndexFailed ${JSON.stringify(e)}`)}
             onScrollEndDrag={(e) => {
               setIsUserScroll(true)
             }}
@@ -396,6 +389,7 @@ export const Agenda = <I extends Item = Item>({
               }
             }}
             scrollEventThrottle={400}
+            initialNumToRender={10}
           />
         ) : null
       ) : noItemsText ? (

@@ -11,7 +11,7 @@ import { s } from '../libs/styles'
 export const ContactsScreen = ({
   navigation,
   route,
-}: Eventful.RN.UserStackScreenProps<'Contacts'>) => {
+}: Eventful.RN.MainStackScreenProps<'Contacts'>) => {
   const { user } = route.params
   const { data, removeContact } = useContacts({ user })
 

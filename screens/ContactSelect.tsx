@@ -16,8 +16,8 @@ export const ContactSelectEvent = createEvent<Eventful.ID[]>()
 export const ContactSelectScreen = ({
   navigation,
   route,
-}: Eventful.RN.EventStackScreenProps<'ContactSelect'>) => {
-  const { user, selected: defaultSelected } = route.params
+}: Eventful.RN.MainStackScreenProps<'ContactSelect'>) => {
+  const { user, selected: defaultSelected, showMe = true } = route.params
   const { data } = useContacts({ user })
   const [selected, setSelected] = useState(defaultSelected)
   const { session } = useSession()
@@ -33,7 +33,7 @@ export const ContactSelectScreen = ({
 
   return (
     <View style={[s.c, s.flx_1]}>
-      {[...(data ?? []), session].map((contact) => {
+      {[...(data ?? []), showMe ? session : null].map((contact) => {
         if (!contact) return null
 
         const value = selected.some((sel) => sel === contact._id)
@@ -41,12 +41,7 @@ export const ContactSelectScreen = ({
           <View key={contact._id.toString()} style={[s.c, s.flx_r, s.jcsb, s.aic]}>
             <Pressable
               style={[s.flx_r, s.aic]}
-              onPress={() =>
-                navigation.navigate('UserTab', {
-                  screen: 'User',
-                  params: { user: contact._id },
-                })
-              }
+              onPress={() => navigation.navigate('User', { user: contact._id })}
             >
               <Avatar username={contact.username} size="medium" />
               <Spacer />

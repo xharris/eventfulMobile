@@ -16,7 +16,7 @@ export const WelcomeScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'
 
   useEffect(() => {
     if (session) {
-      navigation.replace('App', { screen: 'AgendaTab', params: { screen: 'Events' } })
+      navigation.replace('Main', { screen: 'AgendaTab', params: { screen: 'Events' } })
     }
   }, [session])
 

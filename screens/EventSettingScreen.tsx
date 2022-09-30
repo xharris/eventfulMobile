@@ -7,6 +7,7 @@ import { Subheading } from 'react-native-paper'
 import { Eventful } from 'types'
 import { H5 } from '../components/Header'
 import { LoadingView } from '../components/LoadingView'
+import { Spacer } from '../components/Spacer'
 import { useEvent } from '../eventfulLib/event'
 import { TagSelector } from '../features/TagSelector'
 import { extend } from '../libs/log'
@@ -17,7 +18,7 @@ const log = extend('eventsetting')
 export const EventSettingScreen = ({
   navigation,
   route,
-}: Eventful.RN.EventStackScreenProps<'EventSetting'>) => {
+}: Eventful.RN.MainStackScreenProps<'EventSetting'>) => {
   const { event: eventId } = route.params
   const { data: event, updateEvent } = useEvent({ id: eventId })
   const { dirty, values, setFieldValue, submitForm } = useFormik({
@@ -40,6 +41,7 @@ export const EventSettingScreen = ({
   return (
     <LoadingView loading={!event} style={[s.flx_1, s.c]} edges={['bottom', 'left', 'right']}>
       <TagSelector value={values.tags} onChange={(tags) => setFieldValue('tags', tags)} />
+      <Spacer />
       <Pressable
         style={[s.flx_r, s.aic, s.jcsb]}
         onPress={() => setFieldValue('private', !values.private)}

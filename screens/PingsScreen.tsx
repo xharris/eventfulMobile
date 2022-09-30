@@ -6,7 +6,7 @@ import { s, spacing } from '../libs/styles'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 import { usePings } from '../eventfulLib/ping'
 
-export const PingsScreen = ({ navigation }: Eventful.RN.PingsStackScreenProps<'Pings'>) => {
+export const PingsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Pings'>) => {
   const { data: pings } = usePings()
 
   return (

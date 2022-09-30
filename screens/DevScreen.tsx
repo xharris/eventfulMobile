@@ -9,7 +9,7 @@ import { getLogs } from '../libs/log'
 import { getScheduledNotifications } from '../libs/notification'
 import { s } from '../libs/styles'
 
-export const DevScreen = ({}: Eventful.RN.UserStackScreenProps<'Dev'>) => {
+export const DevScreen = ({}: Eventful.RN.MainStackScreenProps<'Dev'>) => {
   const [schedNotifs, setSchedNotifs] = useState<Eventful.LocalNotification[]>([])
   const [logs, setLogs] = useState('')
 

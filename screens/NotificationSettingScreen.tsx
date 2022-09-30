@@ -22,7 +22,7 @@ interface Category {
 export const NotificationSettingScreen = ({
   navigation,
   route,
-}: Eventful.RN.EventStackScreenProps<'NotificationSetting'>) => {
+}: Eventful.RN.MainStackScreenProps<'NotificationSetting'>) => {
   const { type, id } = route.params
   const { data, isEnabled, enable, disable, isFetching } = useNotifications()
 

@@ -14,7 +14,7 @@ import { c, radius, s, spacing } from '../libs/styles'
 
 export const UserSearchScreen = ({
   navigation,
-}: Eventful.RN.UserStackScreenProps<'UserSearch'>) => {
+}: Eventful.RN.MainStackScreenProps<'UserSearch'>) => {
   const { data: users, search } = useUserSearch()
   const { session } = useSession()
   const { data: contacts, addContact } = useContacts({ user: session?._id })

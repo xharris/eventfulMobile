@@ -16,6 +16,7 @@ import {
 } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Eventful } from 'types'
+import { useNavUserAvatar } from '../libs/navUserAvatar'
 import { Avatar, AvatarGroup } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
@@ -35,7 +36,7 @@ import { c, radius, s } from '../libs/styles'
 
 const log = extend('eventsscreen')
 
-const Event = ({
+export const Event = ({
   event,
   onPress,
 }: {
@@ -74,11 +75,11 @@ const Event = ({
   </TouchableRipple>
 )
 
-export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<'Events'>) => {
+export const EventsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Events'>) => {
   const { session } = useSession()
   const { data: events, createEvent, refetch, isRefetching } = useEvents()
   const { data: tags } = useTags({ user: session?._id })
-  const [menuVisible, setMenuVisible] = useState(false)
+  useNavUserAvatar<'Events'>()
 
   const { setFieldValue, values, submitForm } = useFormik({
     initialValues: {
@@ -88,21 +89,30 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
     enableReinitialize: true,
     onSubmit: ({ tags, ...values }) =>
       createEvent(values).then((res) => {
-        navigation.navigate('EventTab', {
-          screen: 'Event',
-          params: { event: res.data._id },
-        })
+        navigation.push('Event', { event: res.data._id })
       }),
   })
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    })
+    navigation.setOptions({})
   }, [navigation])
 
   return (
-    <SafeAreaView style={[s.c, { flex: 1, backgroundColor: c.bg }]}>
+    <SafeAreaView
+      style={[s.c, { flex: 1, backgroundColor: c.bg }]}
+      edges={['left', 'right', 'bottom']}
+    >
+      <Spacer />
+      <Agenda
+        items={events}
+        noTimeHeader="TBD"
+        renderItem={(event) => (
+          <Event event={event} onPress={() => navigation.push('Event', { event: event._id })} />
+        )}
+        refreshing={isRefetching}
+        onRefresh={() => refetch()}
+      />
+
       <View style={[s.flx_c]}>
         <View style={[s.flx_r, s.aic]}>
           <TextInput
@@ -126,27 +136,6 @@ export const EventsScreen = ({ navigation }: Eventful.RN.AgendaStackScreenProps<
           <TagSelector value={values.tags} onChange={(v) => setFieldValue('tags', v)} />
         ) : null}
       </View>
-      <Spacer />
-      <Agenda
-        items={events}
-        noTimeHeader="TBD"
-        renderItem={(event) => (
-          <Event
-            event={event}
-            onPress={() =>
-              navigation.navigate('App', {
-                screen: 'EventTab',
-                params: {
-                  screen: 'Event',
-                  params: { event: event._id },
-                },
-              })
-            }
-          />
-        )}
-        refreshing={isRefetching}
-        onRefresh={() => refetch()}
-      />
     </SafeAreaView>
   )
 }
