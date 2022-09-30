@@ -12,6 +12,27 @@ install! 'cocoapods',
 target 'eventfulMobile' do
   $static_framework = []
   rn_maps_path = '../node_modules/react-native-maps'
+  permissions_path = '../node_modules/react-native-permissions/ios'
+
+  # pod 'Permission-AppTrackingTransparency', :path => "#{permissions_path}/AppTrackingTransparency"
+  # pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral"
+  # pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars"
+  # pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  # pod 'Permission-Contacts', :path => "#{permissions_path}/Contacts"
+  # pod 'Permission-FaceID', :path => "#{permissions_path}/FaceID"
+  # pod 'Permission-LocationAccuracy', :path => "#{permissions_path}/LocationAccuracy"
+  # pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
+  # pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
+  # pod 'Permission-MediaLibrary', :path => "#{permissions_path}/MediaLibrary"
+  # pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+  # pod 'Permission-Motion', :path => "#{permissions_path}/Motion"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
+  # pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
+  # pod 'Permission-PhotoLibraryAddOnly', :path => "#{permissions_path}/PhotoLibraryAddOnly"
+  # pod 'Permission-Reminders', :path => "#{permissions_path}/Reminders"
+  # pod 'Permission-Siri', :path => "#{permissions_path}/Siri"
+  # pod 'Permission-SpeechRecognition', :path => "#{permissions_path}/SpeechRecognition"
+  # pod 'Permission-StoreKit', :path => "#{permissions_path}/StoreKit"
 
   use_expo_modules!
 # @generated begin react-native-maps - expo prebuild (DO NOT MODIFY) sync-e9cc66c360abe50bc66d89fffb3c55b034d7d369
@@ -62,6 +83,13 @@ target 'eventfulMobile' do
                 def pod.build_type;
                 Pod::BuildType.static_library # >= 1.9
             end
+            # if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+            #   def pod.build_type;
+            #     # Uncomment the line corresponding to your CocoaPods version
+            #     Pod::BuildType.static_library # >= 1.9
+            #     # Pod::Target::BuildType.static_library # < 1.9
+            #   end
+            # end
         end
     end
   end
