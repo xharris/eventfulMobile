@@ -3,7 +3,7 @@ import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } f
 import { SectionList, View, Text, useWindowDimensions, ViewProps } from 'react-native'
 import { H1, H2, H3, H4, H5 } from '../components/Header'
 import { Eventful } from 'types'
-import { c, s, spacing } from '../libs/styles'
+import { c, radius, s, spacing } from '../libs/styles'
 import { Spacer } from '../components/Spacer'
 import { Badge, Chip, Title } from 'react-native-paper'
 import Feather from '@expo/vector-icons/Feather'
@@ -37,55 +37,6 @@ interface YearItems<I extends Item> {
   months: MonthItems<I>[]
 }
 
-interface YearProps {
-  label: string
-}
-
-const Year = ({ label }: YearProps) => (
-  <View style={[s.flx_r, s.aic, { paddingVertical: spacing.container }]}>
-    <View
-      style={[
-        s.flx_1,
-        {
-          borderBottomColor: c.oneDark,
-          borderBottomWidth: 1,
-          height: 0,
-          marginHorizontal: spacing.container,
-        },
-      ]}
-    />
-    <H5>{label}</H5>
-    <View
-      style={[
-        s.flx_1,
-        {
-          borderBottomColor: c.oneDark,
-          borderBottomWidth: 1,
-          height: 0,
-          marginHorizontal: spacing.container,
-        },
-      ]}
-    />
-  </View>
-)
-
-interface MonthProps<I extends Item> {
-  label: string
-  days: DayItems<I>[]
-  renderItem: (item: I) => ReactNode
-}
-
-const Month = <I extends Item = Item>({ label, days, renderItem }: MonthProps<I>) => (
-  <View style={[s.flx_c]}>
-    <H3>{label}</H3>
-    <View style={[s.flx_c]}>
-      {days.map((day) => (
-        <Day key={day.day} label={day.day} items={day.items} renderItem={renderItem} />
-      ))}
-    </View>
-  </View>
-)
-
 interface DayProps<I extends Item> {
   label: string
   dayOfWeek?: string
@@ -101,42 +52,44 @@ const Day = <I extends Item = Item>({
   items,
   renderItem,
 }: DayProps<I>) => (
-  <View style={[s.c, s.flx_r]}>
+  <View style={[s.c, s.flx_r, s.aifs]}>
     <View
       style={[
         // s.c,
+        s.flx_r,
         s.aic,
         {
           opacity: 0.4,
         },
       ]}
     >
+      <Text
+        style={{
+          textAlign: 'left',
+          padding: 0,
+          marginHorizontal: 0,
+          fontSize: 20,
+          width: 32,
+        }}
+      >
+        {label}
+      </Text>
       {dayOfWeek ? (
         <Text
           style={{
-            textAlign: 'center',
-            fontSize: 15,
+            textAlign: 'left',
+            fontSize: 12,
             padding: 0,
             margin: 0,
+            width: 32,
           }}
         >
           {dayOfWeek}
         </Text>
       ) : null}
-      <Text
-        style={{
-          minWidth: 50,
-          textAlign: 'center',
-          padding: 0,
-          marginHorizontal: 0,
-          fontSize: 20,
-        }}
-      >
-        {label}
-      </Text>
     </View>
     <Spacer size={spacing.normal} />
-    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1, marginTop: 10 }]}>
+    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1 }]}>
       {items.map((item) => (
         <View
           key={item._id.toString()}
@@ -149,10 +102,6 @@ const Day = <I extends Item = Item>({
     <View />
   </View>
 )
-
-interface AgendaOptions {
-  tbd: boolean
-}
 
 interface AgendaProps<I extends Item> extends ViewProps {
   items?: I[]
@@ -290,20 +239,24 @@ export const Agenda = <I extends Item = Item>({
     // check if there is even a list with items
     if (allItems.length > 0) {
       const today = moment()
+      const scrollTo = moment()
       const monthIdx = allItems.findIndex((item) =>
         item.title.toLowerCase().match(today.format('MMMM').toLowerCase())
       )
-      log.info(`scroll to ${today.format('l')}`)
       log.info(`- month ${monthIdx}`)
       // find current month
       if (monthIdx >= 0) {
-        const dayIdx = allItems[monthIdx].data.findIndex(
-          (item, i) =>
-            parseInt(item.day) >= today.date() || i === allItems[monthIdx].data.length - 1
-        )
+        const dayIdx = allItems[monthIdx].data.findIndex((item, i) => {
+          const ret = parseInt(item.day) >= today.date() || i === allItems[monthIdx].data.length - 1
+          if (ret) {
+            scrollTo.set('date', parseInt(item.day))
+          }
+          return ret
+        })
         log.info(`- day ${dayIdx}`)
         // find current day
         if (dayIdx >= 0) {
+          log.info(`scroll to ${scrollTo.format('l')}`)
           refSectionList.current.scrollToLocation({
             animated: false,
             sectionIndex: monthIdx,
@@ -322,7 +275,7 @@ export const Agenda = <I extends Item = Item>({
 
   return (
     <View style={[s.flx_1, s.flx_c, style]} {...props}>
-      <View style={[s.flx_r, s.aic]}>
+      <View style={[s.flx_r, s.aic, s.c]}>
         <View>
           <Chip
             selected={storage?.agendaView === 'tbd'}
@@ -364,8 +317,12 @@ export const Agenda = <I extends Item = Item>({
             keyExtractor={(item) => item.key}
             renderItem={({ item }) => <Day<I> label={item.day} {...item} renderItem={renderItem} />}
             renderSectionHeader={({ section }) => (
-              <View style={[s.aife]}>
-                <View style={[s.ctrl, { backgroundColor: c.bg }]}>
+              <View style={[s.ctrl, s.aife]}>
+                <View
+                  style={[
+                    { paddingHorizontal: 8, backgroundColor: c.bg, borderRadius: radius.large },
+                  ]}
+                >
                   <Title>{section.title}</Title>
                 </View>
               </View>

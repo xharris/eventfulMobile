@@ -17,6 +17,7 @@ export interface DateTimeInputProps extends ViewProps {
   label?: string
 }
 
+/** Input for date/time */
 export const DateTimeInput = ({
   defaultValue,
   onChange,

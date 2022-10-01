@@ -29,7 +29,7 @@ export const useNavUserAvatar = <T extends keyof Eventful.RN.MainStackParamList>
           ) : null}
           <Spacer size={15} />
           <Pressable onPress={() => session && navigation.push('User', { user: session._id })}>
-            <UserAvatar user={session} />
+            <UserAvatar user={session} size="medium" />
           </Pressable>
         </View>
       ),

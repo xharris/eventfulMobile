@@ -5,12 +5,20 @@ import { View } from 'react-native'
 import { Eventful } from 'types'
 import { H5 } from '../components/Header'
 import { Spacer } from '../components/Spacer'
-import { TextInput } from '../components/TextInput'
 import { useEvent } from '../eventfulLib/event'
 import { useMessages } from '../eventfulLib/message'
 import { useSession } from '../eventfulLib/session'
 import { c, s } from '../libs/styles'
-import { Button, Caption, Dialog, IconButton, Menu, Subheading, Text } from 'react-native-paper'
+import {
+  Button,
+  Caption,
+  Dialog,
+  IconButton,
+  Menu,
+  Subheading,
+  Text,
+  TextInput,
+} from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { useStorage } from '../libs/storage'
 import { usePlans } from '../eventfulLib/plan'
@@ -21,6 +29,8 @@ import { ChatCtxProvider, useChatCtx } from '../features/ChatCtx'
 import { extend } from '../eventfulLib/log'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TagList } from '../features/TagList'
+import { Time } from '../components/Time'
+import { LoadingView } from '../components/LoadingView'
 
 const log = extend('EVENTSCREEN')
 
@@ -195,8 +205,11 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPr
 
   return (
     <ChatCtxProvider>
-      <SafeAreaView style={[s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
-        <TagList style={[s.c]} tags={event?.tags ?? []} />
+      <LoadingView style={[s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
+        <View style={[s.c, s.flx_r, s.jcsb, s.aic]}>
+          {event?.time ? <Time time={event.time} /> : null}
+          <TagList tags={event?.tags ?? []} />
+        </View>
         <PlanList
           style={[s.c, s.flx_1]}
           event={eventId}
@@ -217,7 +230,7 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPr
           mode={storage?.messagesCollapsed ? 'single' : 'full'}
         />
         {!storage?.messagesCollapsed ? <EventInput event={eventId} /> : null}
-      </SafeAreaView>
+      </LoadingView>
       <Dialog visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
         <Dialog.Content>
           <TextInput

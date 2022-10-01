@@ -1,11 +1,14 @@
 import moment from 'moment-timezone'
-import { ComponentProps, useMemo } from 'react'
+import { Component, ComponentProps, ComponentType, FC, useMemo } from 'react'
+import { TextProps } from 'react-native'
+import { Text } from 'react-native-paper'
 import { Eventful } from 'types'
 import { H6 } from './Header'
 
-interface TimeProps extends ComponentProps<typeof H6> {
+interface TimeProps extends TextProps {
   time: Eventful.Time
   onlyTime?: boolean
+  allDayLabel?: string
 }
 
 const calendarFormat = {
@@ -30,13 +33,13 @@ export const formatStart = (time: Eventful.Time) =>
     ? moment(time.start.date).calendar(time.start?.allday ? calendarFormat : calendarFormatTime)
     : null
 
-export const Time = ({ time, onlyTime, ...props }: TimeProps) => {
+export const Time = ({ time, onlyTime, allDayLabel = 'All-day', ...props }: TimeProps) => {
   const str = useMemo(() => {
     const start = time.start ? moment(time.start.date) : null
     const end = time.end ? moment(time.end.date) : null
 
     if (onlyTime && time.start?.allday) {
-      return 'All-day'
+      return allDayLabel
     }
 
     return [
@@ -45,7 +48,7 @@ export const Time = ({ time, onlyTime, ...props }: TimeProps) => {
     ]
       .filter((t) => t)
       .join(' - ')
-  }, [time, onlyTime])
+  }, [time, onlyTime, allDayLabel])
 
-  return time.start ? <H6 {...props}>{str}</H6> : null
+  return time.start ? <Text {...props}>{str}</Text> : null
 }

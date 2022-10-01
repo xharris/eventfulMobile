@@ -5,6 +5,7 @@ import { Checkbox, FAB, TouchableRipple } from 'react-native-paper'
 import { Eventful } from 'types'
 import { Avatar } from '../components/Avatar'
 import { H5 } from '../components/Header'
+import { LoadingView } from '../components/LoadingView'
 import { Spacer } from '../components/Spacer'
 import { useContacts } from '../eventfulLib/contact'
 import { useSession } from '../eventfulLib/session'
@@ -32,7 +33,7 @@ export const ContactSelectScreen = ({
   )
 
   return (
-    <View style={[s.c, s.flx_1]}>
+    <LoadingView style={[s.c, s.flx_1]} edges={['left', 'right', 'bottom']}>
       {[...(data ?? []), showMe ? session : null].map((contact) => {
         if (!contact) return null
 
@@ -70,6 +71,6 @@ export const ContactSelectScreen = ({
           }}
         />
       ) : null} */}
-    </View>
+    </LoadingView>
   )
 }

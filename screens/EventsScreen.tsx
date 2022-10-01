@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
 import { useFormik } from 'formik'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Pressable, PressableProps, ScrollView, TouchableHighlightProps, View } from 'react-native'
 import {
   Caption,
@@ -12,6 +12,8 @@ import {
   List,
   Menu,
   Portal,
+  Text,
+  TextInput,
   TouchableRipple,
 } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -23,7 +25,6 @@ import { Card } from '../components/Card'
 import { H5 } from '../components/Header'
 import { Modal } from '../components/Modal'
 import { Spacer } from '../components/Spacer'
-import { TextInput } from '../components/TextInput'
 import { Time } from '../components/Time'
 import { useEvents } from '../eventfulLib/event'
 import { useSession } from '../eventfulLib/session'
@@ -33,14 +34,18 @@ import { TagList } from '../features/TagList'
 import { TagSelector } from '../features/TagSelector'
 import { extend } from '../libs/log'
 import { c, radius, s } from '../libs/styles'
+import { UserAvatarGroup } from '../features/UserAvatar'
+import { LoadingView } from '../components/LoadingView'
 
 const log = extend('eventsscreen')
 
 export const Event = ({
   event,
+  color,
   onPress,
 }: {
   event: Eventful.API.EventGet
+  color?: string
   onPress: TouchableHighlightProps['onPress']
 }) => (
   <TouchableRipple
@@ -49,28 +54,35 @@ export const Event = ({
       s.jcsb,
       s.aic,
       {
-        borderRadius: radius.normal,
+        borderRadius: radius.large,
+        backgroundColor: color,
       },
     ]}
     onPress={onPress}
   >
-    <View style={[s.flx_r, s.jcsb, s.flx_1]}>
+    <View style={[s.flx_r, s.jcsb, s.flx_1, { padding: 6 }]}>
       <View style={[s.flx_c, s.jcc]}>
         <View style={[s.flx_r, s.aic]}>
-          <H5 style={[s.bold]}>{event.name.length > 0 ? event.name : '(Untitled event)'}</H5>
+          <View style={[s.flx_r, s.aic]}>
+            <Time time={event.time} onlyTime allDayLabel="" style={{ fontSize: 12 }} />
+            <Spacer />
+            <Text style={[s.bold, { fontSize: 14 }]}>
+              {event.name.length > 0 ? event.name : '(Untitled event)'}
+            </Text>
+          </View>
           <Spacer />
           {event.private ? <Feather name="eye-off" /> : null}
         </View>
         <TagList tags={event.tags ?? []} />
       </View>
-      <View style={[s.flx_c, s.aife, s.jcc]}>
-        <AvatarGroup
-          avatars={event.who.map((user) => ({
-            username: user.username,
-          }))}
-        />
-        <Time time={event.time} onlyTime />
-      </View>
+      {/* <View style={[s.flx_c, s.aife, s.jcc]}> */}
+      <UserAvatarGroup
+        avatars={event.who.map((user) => ({
+          size: 'small',
+          user,
+        }))}
+      />
+      {/* </View> */}
     </View>
   </TouchableRipple>
 )
@@ -93,35 +105,35 @@ export const EventsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'E
       }),
   })
 
-  useEffect(() => {
-    navigation.setOptions({})
-  }, [navigation])
+  const avg = useMemo(
+    () => (events ? events?.reduce((total, ev) => total + ev.who.length, 0) / events.length : 0),
+    [events]
+  )
 
   return (
-    <SafeAreaView
-      style={[s.c, { flex: 1, backgroundColor: c.bg }]}
-      edges={['left', 'right', 'bottom']}
-    >
+    <LoadingView style={[{ flex: 1 }]} edges={['left', 'right', 'bottom']}>
       <Spacer />
       <Agenda
         items={events}
         noTimeHeader="TBD"
         renderItem={(event) => (
-          <Event event={event} onPress={() => navigation.push('Event', { event: event._id })} />
+          <Event
+            event={event}
+            onPress={() => navigation.push('Event', { event: event._id })}
+            color={event.who.length > avg ? c.twoDark : !!event.who.length ? c.twoLight : c.surf}
+          />
         )}
         refreshing={isRefetching}
         onRefresh={() => refetch()}
       />
-
-      <View style={[s.flx_c]}>
+      <View style={[s.flx_c, s.c]}>
         <View style={[s.flx_r, s.aic]}>
           <TextInput
             style={[s.flx_1]}
             placeholder="What are you planning?"
             value={values.name}
             onChangeText={(v) => setFieldValue('name', v)}
-            mode="outlined"
-            outlineColor="transparent"
+            mode="flat"
             dense
           />
           <IconButton
@@ -136,6 +148,6 @@ export const EventsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'E
           <TagSelector value={values.tags} onChange={(v) => setFieldValue('tags', v)} />
         ) : null}
       </View>
-    </SafeAreaView>
+    </LoadingView>
   )
 }

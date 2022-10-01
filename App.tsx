@@ -110,6 +110,7 @@ const MainNav = () => {
       initialRouteName="Events"
       screenOptions={{
         headerTitle: '',
+        headerTransparent: true,
       }}
     >
       <MainStack.Screen name="Events" component={EventsScreen} />

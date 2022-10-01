@@ -1,10 +1,11 @@
 import Feather from '@expo/vector-icons/Feather'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Pressable, View } from 'react-native'
 import { Eventful } from 'types'
 import { Avatar } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { H5 } from '../components/Header'
+import { LoadingView } from '../components/LoadingView'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
 import { useContacts } from '../eventfulLib/contact'
@@ -20,7 +21,7 @@ export const UserSearchScreen = ({
   const { data: contacts, addContact } = useContacts({ user: session?._id })
 
   return (
-    <View style={[s.c, s.flx_c]}>
+    <LoadingView style={[s.c, s.flx_c]} edges={['left', 'right', 'bottom']}>
       <TextInput label="Search by username" onChangeText={(v) => search(v)} autoCapitalize="none" />
       <Spacer />
       <View style={[s.flx_c]}>
@@ -51,6 +52,6 @@ export const UserSearchScreen = ({
           </View>
         ))}
       </View>
-    </View>
+    </LoadingView>
   )
 }

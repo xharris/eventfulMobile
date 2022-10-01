@@ -27,6 +27,7 @@ import { useSnackbar } from '../components/Snackbar'
 import { useFormik } from 'formik'
 import { FEEDBACK, useFeedback } from '../eventfulLib/feedback'
 import { extend, getLogs } from '../eventfulLib/log'
+import { LoadingView } from '../components/LoadingView'
 
 const log = extend('USER')
 
@@ -67,20 +68,18 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPro
     },
   })
 
-  const index = useNavigationState((state) => state.index)
-
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '',
       headerRight: () =>
-        index === 0 ? (
+        session?._id === user ? (
           <IconButton
             icon={(props) => <Feather {...props} name="search" />}
             onPress={() => navigation.push('UserSearch')}
           />
         ) : null,
     })
-  }, [navigation, index])
+  }, [navigation, user, session])
 
   const isContact = useMemo(
     () => (user !== session?._id ? contacts?.some((contact) => contact._id === user) : false),
@@ -109,7 +108,11 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPro
   }, [devPresses, storage])
 
   return (
-    <View style={[s.c, s.flx_c, s.jcsa, s.flx_1]}>
+    <LoadingView
+      style={[s.c, s.flx_c, s.jcsa, s.flx_1]}
+      loading={!data}
+      edges={['left', 'right', 'bottom']}
+    >
       <View style={[s.flx_r, s.jcsa, s.aic, s.flx_1]}>
         <Pressable
           onPress={() => {
@@ -270,6 +273,6 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPro
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </View>
+    </LoadingView>
   )
 }

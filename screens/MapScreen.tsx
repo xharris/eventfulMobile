@@ -8,16 +8,20 @@ import * as Location from 'expo-location'
 import { useHeaderHeight } from '@react-navigation/elements'
 import { Button } from '../components/Button'
 import imgPing from '../assets/images/ping.png'
+import { LoadingView } from '../components/LoadingView'
 
 export const MapScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Map'>) => {
   const [location, setLocation] = useState<Location.LocationObject>()
   const [ready, setReady] = useState(false)
+
+  const [status, requestPermission] = Location.useForegroundPermissions()
+
   useEffect(() => {
-    Location.requestForegroundPermissionsAsync()
-      .then(({ status }) => {
-        if (status === 'granted') {
-          return Location.getCurrentPositionAsync()
-        }
+    requestPermission()
+      .then(() => {
+        // if (res.status === 'granted') {
+        return Location.getCurrentPositionAsync()
+        // }
       })
       .then((loc) => {
         if (loc) {
@@ -25,7 +29,7 @@ export const MapScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Map'
         }
         setReady(true)
       })
-  })
+  }, [requestPermission])
 
   useEffect(() => {
     navigation.setOptions({
@@ -33,10 +37,8 @@ export const MapScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Map'
     })
   }, [navigation])
 
-  const headerHeight = useHeaderHeight()
-
   return (
-    <View>
+    <LoadingView>
       {ready ? (
         <MapView
           style={{
@@ -77,6 +79,6 @@ export const MapScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'Map'
       >
         <Image source={imgPing} />
       </View>
-    </View>
+    </LoadingView>
   )
 }

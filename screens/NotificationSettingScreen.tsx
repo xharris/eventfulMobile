@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native'
 import { Checkbox } from 'react-native-paper'
 import { Eventful } from 'types'
 import { H3, H5 } from '../components/Header'
+import { LoadingView } from '../components/LoadingView'
 import { Spacer } from '../components/Spacer'
 import { useNotifications } from '../eventfulLib/notification'
 import { s } from '../libs/styles'
@@ -47,8 +48,8 @@ export const NotificationSettingScreen = ({
     [type, id]
   )
 
-  return isFetching ? null : (
-    <View style={[s.c]}>
+  return (
+    <LoadingView style={[s.c]} loading={isFetching} edges={['bottom', 'left', 'right']}>
       {items.map(({ category, items, ref, refModel }) => (
         <View key={category} style={[s.c]}>
           <H3>{category}</H3>
@@ -68,6 +69,6 @@ export const NotificationSettingScreen = ({
           ))}
         </View>
       ))}
-    </View>
+    </LoadingView>
   )
 }

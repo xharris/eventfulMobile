@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native'
 import { Button, Caption, List, Text, Title } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Eventful } from 'types'
+import { LoadingView } from '../components/LoadingView'
 import { Spacer } from '../components/Spacer'
 import { getLogs } from '../libs/log'
 import { getScheduledNotifications } from '../libs/notification'
@@ -25,7 +26,7 @@ export const DevScreen = ({}: Eventful.RN.MainStackScreenProps<'Dev'>) => {
   }, [])
 
   return (
-    <SafeAreaView style={[s.c, s.flx_1, s.flx_c]} edges={['left', 'right', 'bottom']}>
+    <LoadingView style={[s.c, s.flx_1, s.flx_c]} edges={['left', 'right', 'bottom']}>
       <Button icon={(props) => <Feather {...props} name="refresh-cw" />} onPress={fetchEverything}>
         Refresh
       </Button>
@@ -50,6 +51,6 @@ export const DevScreen = ({}: Eventful.RN.MainStackScreenProps<'Dev'>) => {
           <Text>{logs}</Text>
         </List.Accordion>
       </ScrollView>
-    </SafeAreaView>
+    </LoadingView>
   )
 }

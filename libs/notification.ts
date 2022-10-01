@@ -13,6 +13,14 @@ import {
 } from 'expo-notifications'
 import * as Linking from 'expo-linking'
 import { extend } from '../eventfulLib/log'
+import {
+  check,
+  checkNotifications,
+  PERMISSIONS,
+  requestNotifications,
+  RESULTS,
+} from 'react-native-permissions'
+import { Platform } from 'react-native'
 
 const log = extend('LIB/NOTIFICATION')
 
@@ -33,13 +41,19 @@ messaging().setBackgroundMessageHandler(async (msg) => {
 })
 
 export const requestPermission = () =>
-  messaging()
-    .requestPermission()
-    .then(
-      (status) =>
-        status === messaging.AuthorizationStatus.AUTHORIZED ||
-        status === messaging.AuthorizationStatus.PROVISIONAL
-    )
+  requestNotifications(['alert', 'badge', 'sound'])
+    .then((res) => res.status === RESULTS.GRANTED || res.status === RESULTS.LIMITED)
+    .catch(log.error)
+// Platform.OS !== 'android'
+//   ? Promise.resolve(true)
+//   : check(PERMISSIONS.ANDROID.POST_NOTIFICATIONS).then((status) => status === RESULTS.GRANTED)
+// messaging()
+//   .requestPermission()
+//   .then(
+//     (status) =>
+//       status === messaging.AuthorizationStatus.AUTHORIZED ||
+//       status === messaging.AuthorizationStatus.PROVISIONAL
+//   )
 
 export const showLocalNotification = (payload: Eventful.NotificationPayload) =>
   new Notification(payload.notification?.title ?? '', {

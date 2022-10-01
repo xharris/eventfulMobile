@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import { IconButton, List } from 'react-native-paper'
 import { Eventful } from 'types'
 import { Avatar } from '../components/Avatar'
+import { LoadingView } from '../components/LoadingView'
 import { useContacts } from '../eventfulLib/contact'
 import { AreYouSure } from '../libs/dialog'
 import { s } from '../libs/styles'
@@ -16,7 +17,7 @@ export const ContactsScreen = ({
   const { data, removeContact } = useContacts({ user })
 
   return (
-    <View style={[s.c, s.flx_1]}>
+    <LoadingView style={[s.c, s.flx_1]} loading={!data} edges={['bottom', 'left', 'right']}>
       {data?.map((contact) => (
         <List.Item
           key={contact._id.toString()}
@@ -31,6 +32,6 @@ export const ContactsScreen = ({
           )}
         />
       ))}
-    </View>
+    </LoadingView>
   )
 }
