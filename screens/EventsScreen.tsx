@@ -56,11 +56,26 @@ export const Event = ({
       {
         borderRadius: radius.large,
         backgroundColor: color,
+        opacity:
+          event.time &&
+          event.time.start &&
+          moment(event.time.end?.date ?? event.time.start.date).isSameOrBefore(moment.now())
+            ? 0.4
+            : 1,
       },
     ]}
     onPress={onPress}
   >
-    <View style={[s.flx_r, s.jcsb, s.flx_1, { padding: 6 }]}>
+    <View
+      style={[
+        s.flx_r,
+        s.jcsb,
+        s.flx_1,
+        {
+          padding: 6,
+        },
+      ]}
+    >
       <View style={[s.flx_c, s.jcc]}>
         <View style={[s.flx_r, s.aic]}>
           <View style={[s.flx_r, s.aic]}>

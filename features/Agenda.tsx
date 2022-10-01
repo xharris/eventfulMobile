@@ -40,18 +40,11 @@ interface YearItems<I extends Item> {
 interface DayProps<I extends Item> {
   label: string
   dayOfWeek?: string
-  isOld?: boolean
   items: I[]
   renderItem: (item: I) => ReactNode
 }
 
-const Day = <I extends Item = Item>({
-  label,
-  dayOfWeek,
-  isOld,
-  items,
-  renderItem,
-}: DayProps<I>) => (
+const Day = <I extends Item = Item>({ label, dayOfWeek, items, renderItem }: DayProps<I>) => (
   <View style={[s.c, s.flx_r, s.aifs]}>
     <View
       style={[
@@ -89,7 +82,7 @@ const Day = <I extends Item = Item>({
       ) : null}
     </View>
     <Spacer size={spacing.normal} />
-    <View style={[s.flx_c, s.flx_1, { opacity: isOld ? 0.4 : 1 }]}>
+    <View style={[s.flx_c, s.flx_1]}>
       {items.map((item) => (
         <View
           key={item._id.toString()}
@@ -192,7 +185,6 @@ export const Agenda = <I extends Item = Item>({
               .map(([day, items]) => ({
                 key: `${year}-${month}-${day}`,
                 dayOfWeek: moment(`${year}-${month}-${day}`, 'YYYY-MMMM-DD').format('ddd'),
-                isOld: moment(`${year}-${month}-${day}`, 'YYYY-MMMM-DD').isBefore(new Date()),
                 day,
                 items,
               })),
