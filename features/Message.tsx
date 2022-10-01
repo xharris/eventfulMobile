@@ -9,7 +9,7 @@ import { H5, H6 } from '../components/Header'
 import { Spacer } from '../components/Spacer'
 import { c, s } from '../libs/styles'
 
-interface MessageProps extends PressableProps {
+export interface MessageProps extends PressableProps {
   message: Eventful.API.MessageGet
   prevSameUser?: boolean
 }

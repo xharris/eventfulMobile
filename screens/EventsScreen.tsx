@@ -41,7 +41,7 @@ const log = extend('eventsscreen')
 
 export const Event = ({
   event,
-  color,
+  color = c.surf,
   onPress,
 }: {
   event: Eventful.API.EventGet
@@ -112,7 +112,6 @@ export const EventsScreen = ({ navigation }: Eventful.RN.MainStackScreenProps<'E
 
   return (
     <LoadingView style={[{ flex: 1 }]} edges={['left', 'right', 'bottom']}>
-      <Spacer />
       <Agenda
         items={events}
         noTimeHeader="TBD"

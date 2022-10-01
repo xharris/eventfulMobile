@@ -31,95 +31,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { TagList } from '../features/TagList'
 import { Time } from '../components/Time'
 import { LoadingView } from '../components/LoadingView'
+import { MessageInput } from '../features/MessageInput'
+import { Chat } from '../features/Chat'
 
 const log = extend('EVENTSCREEN')
-
-const EventInput = ({ event }: { event: Eventful.ID }) => {
-  const [text, setText] = useState('')
-  const { addMessage, updateMessage } = useMessages({ event })
-  const [{ options, editing, replying }, setChatCtx] = useChatCtx()
-
-  const submitMessage = useCallback(() => {
-    if (editing) {
-      updateMessage({
-        _id: editing._id,
-        text,
-        replyTo: replying?._id,
-      })
-    } else {
-      addMessage({
-        text,
-        replyTo: replying?._id,
-      })
-    }
-    setText('')
-    setChatCtx((prev) => ({ options: prev.options }))
-  }, [replying, editing, text])
-
-  useEffect(() => {
-    if (editing) {
-      setText(editing.text)
-    } else {
-      setText('')
-    }
-  }, [editing])
-
-  return (
-    <View style={[s.c, s.flx_c]}>
-      {!!replying ? (
-        <View style={[s.flx_r, s.aic]}>
-          <IconButton
-            icon={() => <Feather name="x" size={s.h5.fontSize} />}
-            onPress={() => setChatCtx((prev) => ({ ...prev, replying: undefined }))}
-          />
-          <Spacer size={12} />
-          <Feather name="corner-up-left" />
-          <H5 style={[s.bold]}>{replying.createdBy.username}</H5>
-          <Spacer />
-          <H5>{replying.text}</H5>
-        </View>
-      ) : null}
-      <View style={[s.flx_r, s.aic]}>
-        {/* <Button
-          iconRight={() => <Feather name="plus" size={s.h5.fontSize} />}
-          style={{
-            backgroundColor: 'transparent',
-          }}
-        /> */}
-
-        {!!editing ? (
-          <>
-            <Feather name="edit-2" size={s.h5.fontSize} />
-            <IconButton
-              icon={() => <Feather name="x" size={s.h5.fontSize} />}
-              onPress={() => setChatCtx((prev) => ({ ...prev, editing: undefined }))}
-            />
-          </>
-        ) : null}
-        <TextInput
-          style={[s.flx_1, { paddingTop: 10 }]}
-          dense
-          multiline
-          value={text}
-          onChangeText={setText}
-          placeholder="Type a message..."
-        />
-        {!!text.length ? (
-          <IconButton
-            icon={() => <Feather name="send" size={s.h5.fontSize} />}
-            style={{
-              backgroundColor: 'transparent',
-            }}
-            onPress={() => {
-              submitMessage()
-              // Keyboard.dismiss()
-            }}
-          />
-        ) : null}
-      </View>
-    </View>
-  )
-}
 
 export const EventScreen = ({ navigation, route }: Eventful.RN.MainStackScreenProps<'Event'>) => {
   const { event: eventId } = route.params
@@ -205,31 +120,24 @@ export const EventScreen = ({ navigation, route }: Eventful.RN.MainStackScreenPr
 
   return (
     <ChatCtxProvider>
-      <LoadingView style={[s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
+      <LoadingView style={[s.c, s.flx_c, s.flx_1]} edges={['bottom', 'left', 'right']}>
         <View style={[s.c, s.flx_r, s.jcsb, s.aic]}>
           {event?.time ? <Time time={event.time} /> : null}
-          <TagList tags={event?.tags ?? []} />
+          <TagList
+            tags={event?.tags ?? []}
+            onTagPress={(tag) => navigation.push('Tag', { tag: tag._id })}
+          />
         </View>
         <PlanList
-          style={[s.c, s.flx_1]}
+          style={[s.flx_1]}
           event={eventId}
           onPlanPress={(id) => navigation.push('PlanEdit', { plan: id })}
           onPlanAdd={(body) =>
             addPlan(body).then((res) => navigation.push('PlanEdit', { plan: res.data._id }))
           }
           expanded={storage?.messagesCollapsed}
-          onExpandChange={() =>
-            store({
-              messagesCollapsed: !storage?.messagesCollapsed,
-            })
-          }
         />
-        <MessageList
-          event={eventId}
-          style={storage?.messagesCollapsed ? null : [s.flx_1]}
-          mode={storage?.messagesCollapsed ? 'single' : 'full'}
-        />
-        {!storage?.messagesCollapsed ? <EventInput event={eventId} /> : null}
+        <Chat event={eventId} />
       </LoadingView>
       <Dialog visible={showTitleEdit} onDismiss={() => setShowTitleEdit(false)}>
         <Dialog.Content>

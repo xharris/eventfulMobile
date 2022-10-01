@@ -117,6 +117,7 @@ export const s = StyleSheet.create({
   asfe: { alignSelf: 'flex-end' },
   asc: { alignSelf: 'center' },
   ass: { alignSelf: 'stretch' },
+  acsb: { alignContent: 'space-between' },
   /** container */
   c: {
     padding: spacing.container,
@@ -139,6 +140,10 @@ export const s = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
+  },
+  debug: {
+    borderWidth: 1,
+    borderColor: 'black',
   },
 })
 

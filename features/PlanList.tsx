@@ -10,13 +10,13 @@ import { Button, Dialog, Headline, IconButton, List, Menu, Portal } from 'react-
 import { CATEGORY_INFO } from '../eventfulLib/plan'
 import { CATEGORY_ICON } from '../libs/plan'
 import { Modal } from '../components/Modal'
+import moment from 'moment-timezone'
 
 interface PlanListProps extends ViewProps {
   event?: Eventful.ID
   onPlanPress: (id: Eventful.ID) => void
   onPlanAdd: (body: Eventful.API.PlanAdd) => void
   expanded?: boolean
-  onExpandChange?: () => void
 }
 
 export const PlanList = ({
@@ -24,7 +24,6 @@ export const PlanList = ({
   onPlanPress,
   onPlanAdd,
   expanded,
-  onExpandChange,
   ...props
 }: PlanListProps) => {
   const { data: event } = useEvent({ id: eventId })
@@ -33,16 +32,10 @@ export const PlanList = ({
   const items = useMemo(
     () =>
       event?.plans.sort((a, b) => {
-        if (!a.time?.start || !b.time?.start) {
-          if (!b.time?.start) {
-            return -1
-          }
-          if (!a.time?.start) {
-            return 1
-          }
-          return 0
+        if (a.time?.start && b.time?.start) {
+          return moment(a.time.start.date).unix() - moment(b.time.start.date).unix()
         }
-        return b.time?.start?.date.valueOf() - a.time?.start?.date.valueOf()
+        return moment(a.createdAt).unix() - moment(b.createdAt).unix()
       }),
     [event]
   )
@@ -84,7 +77,7 @@ export const PlanList = ({
           keyExtractor={(item) => item._id.toString()}
           contentContainerStyle={{ padding: 4 }}
           renderItem={({ item }) => (
-            <View style={[s.flx_1]}>
+            <View style={[{ paddingVertical: 4 }, s.flx_1]}>
               <Plan plan={item} onPress={() => onPlanPress(item._id)} />
             </View>
           )}
@@ -104,17 +97,7 @@ export const PlanList = ({
       )}
       {!!items?.length ? (
         <View style={[s.flx_r, s.jcsb]}>
-          {onExpandChange ? (
-            <IconButton
-              icon={(props) => (
-                <Feather {...props} name={expanded ? 'chevron-up' : 'chevron-down'} />
-              )}
-              onPress={onExpandChange}
-            />
-          ) : (
-            <Spacer />
-          )}
-          <Spacer />
+          <View />
           <IconButton
             icon={(props) => <Feather name="plus" {...props} />}
             onPress={() => setAddPlanVisible(true)}

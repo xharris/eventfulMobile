@@ -8,24 +8,24 @@ import { Spacer } from '../components/Spacer'
 import { useEvent } from '../eventfulLib/event'
 import { useMessages } from '../eventfulLib/message'
 import { useSession } from '../eventfulLib/session'
-import { Message } from '../features/Message'
+import { Message, MessageProps } from '../features/Message'
 import { Plan } from '../features/Plan'
 import { c, s, spacing } from '../libs/styles'
-import { Menu, Portal, Text } from 'react-native-paper'
+import { Caption, Card, Menu, Portal, Text } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { H4 } from '../components/Header'
 import { useChatCtx } from './ChatCtx'
 import { Modal } from '../components/Modal'
+import { useStorage } from '../libs/storage'
 
-interface MessageItemProps {
-  data: Eventful.API.MessageGet
+interface MessageItemProps extends MessageProps {
   prevSameUser: boolean
   onContextMenu: () => void
 }
 
-const MessageItem = ({ data, prevSameUser, onContextMenu }: MessageItemProps) => (
+const MessageItem = ({ prevSameUser, onContextMenu, ...props }: MessageItemProps) => (
   <Message
-    message={data}
+    {...props}
     prevSameUser={prevSameUser}
     // delayLongPress={250}
     onPress={() => onContextMenu()}
@@ -37,17 +37,13 @@ interface MessageListProps extends ViewProps {
   mode?: 'single' | 'full'
 }
 
-export const MessageList = ({
-  event: eventId,
-  style,
-  mode = 'full',
-  ...props
-}: MessageListProps) => {
+export const MessageList = ({ event: eventId, mode = 'full', ...props }: MessageListProps) => {
   const { data: messages } = useMessages({ event: eventId })
   const [{ options }, setChatCtx] = useChatCtx()
   const { data: event } = useEvent({ id: eventId })
   const [messageMenuVisible, setMessageMenuVisible] = useState<Eventful.API.MessageGet>()
   const { session } = useSession()
+  const [storage, setStorage] = useStorage()
 
   const items = useMemo(
     () =>
@@ -56,15 +52,16 @@ export const MessageList = ({
   )
 
   return (
-    <View style={[s.c, style]} {...props}>
-      {items ? (
+    <View {...props}>
+      {!!items?.length ? (
         <FlatList
           data={mode === 'single' ? items.slice(0, 1) : items}
           keyExtractor={(item) => item._id.toString()}
           contentContainerStyle={{ padding: 4 }}
           renderItem={({ item, index }) => (
             <MessageItem
-              data={item}
+              message={item}
+              disabled={mode === 'single'}
               prevSameUser={
                 mode === 'single'
                   ? false
@@ -72,12 +69,18 @@ export const MessageList = ({
                     items[index + 1].createdBy._id === item.createdBy._id
               }
               onContextMenu={() => {
-                setMessageMenuVisible(item)
+                if (mode === 'full') {
+                  setMessageMenuVisible(item)
+                } else {
+                  setStorage({ messagesCollapsed: !storage?.messagesCollapsed })
+                }
               }}
             />
           )}
           inverted
         />
+      ) : mode === 'single' ? (
+        <Caption>Open chat...</Caption>
       ) : null}
       <Modal
         visible={!!messageMenuVisible}
