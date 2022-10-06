@@ -7,6 +7,7 @@ import { useFormik } from 'formik'
 import { Button } from '../components/Button'
 import { TextInput } from '../components/TextInput'
 import { Spacer } from '../components/Spacer'
+import { LoadingView } from '../components/LoadingView'
 
 export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Auth'>) => {
   useEffect(() => {
@@ -30,7 +31,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               if (res && res.status < 300) {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'App' }],
+                  routes: [{ name: 'Main' }],
                 })
               }
             })
@@ -40,7 +41,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
               if (res && res.status < 300) {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'App' }],
+                  routes: [{ name: 'Main' }],
                 })
               }
             })
@@ -49,7 +50,7 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
   })
 
   return (
-    <View style={[s.c, s.flx_1, s.flx_c, s.jcsa]}>
+    <LoadingView style={[s.c, s.flx_1, s.flx_c, s.jcsa]} edges={['left', 'right', 'bottom']}>
       <View style={[s.flx_c, s.jcsa]}>
         {isSigningUp ? (
           <>
@@ -121,6 +122,6 @@ export const AuthScreen = ({ navigation }: Eventful.RN.RootStackScreenProps<'Aut
           onPress={() => setIsSigningUp(!isSigningUp)}
         />
       </View>
-    </View>
+    </LoadingView>
   )
 }

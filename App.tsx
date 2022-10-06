@@ -2,7 +2,7 @@
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider, useSession } from './eventfulLib/session'
-import { DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
+import { NavigationContainer, useNavigation } from '@react-navigation/native'
 import { EventsScreen } from './screens/EventsScreen'
 import { Eventful } from 'types'
 import { Provider, DefaultTheme as DefaultPaperTheme } from 'react-native-paper'
@@ -13,15 +13,11 @@ import { ContactsScreen } from './screens/ContactsScreen'
 import { EventScreen } from './screens/EventScreen'
 import { NotificationSettingScreen } from './screens/NotificationSettingScreen'
 import { PlanEditScreen } from './screens/PlanEditScreen'
-import { c, radius, useAnimatedValue } from './libs/styles'
+import { c, radius } from './libs/styles'
 import { ContactSelectScreen } from './screens/ContactSelect'
 import { StatusBar } from 'expo-status-bar'
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Animated, View } from 'react-native'
-import { useStorage } from './libs/storage'
-import Feather from '@expo/vector-icons/Feather'
-import { ComponentProps, useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { UserSearchScreen } from './screens/UserSearchScreen'
 import { SnackbarProvider, useSnackbar } from './components/Snackbar'
 import { api } from './eventfulLib/api'
@@ -34,6 +30,10 @@ import { useReminderScheduler } from './eventfulLib/reminder'
 import { DevScreen } from './screens/DevScreen'
 import { extend } from './eventfulLib/log'
 import { parse, useURL } from 'expo-linking'
+import { EventSettingScreen } from './screens/EventSettingScreen'
+import { TagScreen } from './screens/TagScreen'
+import { TagsScreen } from './screens/TagsScreen'
+import { NotificationsScreen } from './screens/NotificationsScreen'
 
 const log = extend('APP')
 
@@ -47,7 +47,7 @@ const Inner = () => {
   useReminderScheduler()
   const url = useURL()
 
-  const navigation = useNavigation<Eventful.RN.RootStackScreenProps<'App'>['navigation']>()
+  const navigation = useNavigation<Eventful.RN.RootStackScreenProps<'Main'>['navigation']>()
 
   useEffect(() => {
     if (url) {
@@ -56,13 +56,13 @@ const Inner = () => {
         log.info('deep link', url, queryParams)
         const { eventId, userId } = queryParams as { eventId?: Eventful.ID; userId?: Eventful.ID }
         if (eventId) {
-          navigation.navigate('App', {
+          navigation.navigate('Main', {
             screen: 'EventTab',
             params: { screen: 'Event', params: { event: eventId } },
           })
         }
         if (userId) {
-          navigation.navigate('App', {
+          navigation.navigate('Main', {
             screen: 'UserTab',
             params: { screen: 'User', params: { user: userId } },
           })
@@ -100,148 +100,54 @@ const Inner = () => {
 }
 
 const WelcomeStack = createNativeStackNavigator()
-const MapStack = createNativeStackNavigator()
-const PingsStack = createNativeStackNavigator()
-const AgendaStack = createNativeStackNavigator()
-const EventStack = createNativeStackNavigator()
-const UserStack = createNativeStackNavigator()
-const BottomTabs = createMaterialBottomTabNavigator()
+const MainStack = createNativeStackNavigator()
 
-// const DrawerNav = () => (
-
-// )
-
-const TabIcon = ({
-  name,
-  focused,
-  color,
-}: {
-  name: ComponentProps<typeof Feather>['name']
-  focused: boolean
-  color: string
-}) => {
-  // const size = useAnimatedValue(focused ? 14 : 18, focused ? 18 : 14)
-
-  return <Feather style={{ color }} name={name} size={18} />
-}
-
-const AppNav = () => {
-  const [storage] = useStorage()
+const MainNav = () => {
   const { session } = useSession()
 
   return (
-    <BottomTabs.Navigator initialRouteName="AgendaTab" shifting={true}>
-      <BottomTabs.Screen
-        name="AgendaTab"
-        options={{
-          title: 'Agenda',
-          tabBarColor: '#1A237E',
-          tabBarIcon: (props) => <TabIcon {...props} name="calendar" />,
-        }}
-      >
-        {() => (
-          <AgendaStack.Navigator>
-            <AgendaStack.Screen name="Events" component={EventsScreen} />
-          </AgendaStack.Navigator>
-        )}
-      </BottomTabs.Screen>
-      {/* <BottomTabs.Screen
-        name="MapTab"
-        options={{
-          title: 'Map',
-          tabBarColor: '#1A237E',
-          tabBarIcon: (props) => <TabIcon {...props} name="map" />,
-        }}
-      >
-        {() => (
-          <MapStack.Navigator>
-            <MapStack.Screen name="Map" component={MapScreen} />
-          </MapStack.Navigator>
-        )}
-      </BottomTabs.Screen> */}
-      {/* <BottomTabs.Screen
-        name="PingsTab"
-        options={{
-          title: 'Pings',
-          tabBarColor: '#0D47A1',
-          tabBarIcon: (props) => <TabIcon {...props} name="map-pin" />,
-        }}
-      >
-        {() => (
-          <PingsStack.Navigator>
-            <PingsStack.Screen name="Pings" component={PingsScreen} />
-          </PingsStack.Navigator>
-        )}
-      </BottomTabs.Screen> */}
-      <BottomTabs.Screen
-        name="EventTab"
-        options={{
-          title: 'Event',
-          tabBarColor: '#0D47A1',
-          tabBarIcon: (props) =>
-            !!storage?.lastEvent ? <TabIcon {...props} name="align-left" /> : null,
-        }}
-        listeners={{
-          tabPress: (e) => {
-            if (!storage?.lastEvent) {
-              e.preventDefault()
-            }
-          },
-        }}
-      >
-        {() => (
-          <EventStack.Navigator>
-            <EventStack.Screen
-              name="Event"
-              component={EventScreen}
-              initialParams={{ event: storage?.lastEvent }}
-            />
-            <EventStack.Screen name="PlanEdit" component={PlanEditScreen} />
-            <EventStack.Screen name="ContactSelect" component={ContactSelectScreen} />
-            <EventStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
-          </EventStack.Navigator>
-        )}
-      </BottomTabs.Screen>
-      <BottomTabs.Screen
-        name="UserTab"
-        options={{
-          title: 'User',
-          tabBarColor: '#006064',
-          tabBarIcon: (props) => <TabIcon {...props} name="user" />,
-        }}
-      >
-        {() => (
-          <UserStack.Navigator>
-            <UserStack.Screen
-              name="User"
-              component={UserScreen}
-              initialParams={{ user: session?._id }}
-            />
-            <UserStack.Screen name="Contacts" component={ContactsScreen} />
-            <UserStack.Screen name="ReminderEdit" component={ReminderEditScreen} />
-            <UserStack.Screen
-              name="UserSearch"
-              component={UserSearchScreen}
-              options={{ title: 'Search for people' }}
-            />
-            <UserStack.Screen
-              name="Dev"
-              component={DevScreen}
-              options={{ title: 'WTF is going on' }}
-            />
-          </UserStack.Navigator>
-        )}
-      </BottomTabs.Screen>
-    </BottomTabs.Navigator>
+    <MainStack.Navigator
+      initialRouteName="Events"
+      screenOptions={{
+        headerTitle: '',
+        headerTransparent: true,
+      }}
+    >
+      <MainStack.Screen name="Events" component={EventsScreen} />
+      <MainStack.Screen name="Event" component={EventScreen} />
+      <MainStack.Screen name="ContactSelect" component={ContactSelectScreen} />
+      <MainStack.Screen name="PlanEdit" component={PlanEditScreen} />
+      <MainStack.Screen name="EventSetting" component={EventSettingScreen} />
+      <MainStack.Screen name="NotificationSetting" component={NotificationSettingScreen} />
+      <MainStack.Screen name="Notifications" component={NotificationsScreen} />
+      <MainStack.Screen name="User" component={UserScreen} initialParams={{ user: session?._id }} />
+      <MainStack.Screen name="Tag" component={TagScreen} />
+      <MainStack.Screen
+        name="UserSearch"
+        component={UserSearchScreen}
+        options={{ title: 'Search for people' }}
+      />
+      {/* <MainStack.Screen name='UserSetting' component={} /> */}
+      <MainStack.Screen name="ReminderEdit" component={ReminderEditScreen} />
+      <MainStack.Screen name="Contacts" component={ContactsScreen} />
+      <MainStack.Screen name="Tags" component={TagsScreen} />
+      <MainStack.Screen name="Dev" component={DevScreen} options={{ title: 'WTF is going on' }} />
+      {/* <MainStack.Screen name='Map' component={} />
+      <MainStack.Screen name='Pings' component={} /> */}
+    </MainStack.Navigator>
   )
 }
 
 const Nav = () => {
   return (
-    <WelcomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <WelcomeStack.Screen name="Welcome" component={WelcomeScreen} />
-      <WelcomeStack.Screen name="Auth" component={AuthScreen} />
-      <WelcomeStack.Screen name="App" component={AppNav} />
+    <WelcomeStack.Navigator>
+      <WelcomeStack.Screen
+        name="Welcome"
+        component={WelcomeScreen}
+        options={{ headerShown: false }}
+      />
+      <WelcomeStack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
+      <WelcomeStack.Screen name="Main" component={MainNav} options={{ headerShown: false }} />
     </WelcomeStack.Navigator>
   )
 }

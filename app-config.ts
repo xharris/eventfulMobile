@@ -1,5 +1,6 @@
 import { ExpoConfig } from '@expo/config-types'
 import 'dotenv/config'
+import { withAndroid33 } from './plugins/android33'
 
 const { MAPS_KEY, NODE_ENV } = process.env as unknown as {
   MAPS_KEY: string
@@ -72,5 +73,6 @@ export default {
         },
       },
     ],
+    [withAndroid33],
   ],
 } as ExpoConfig

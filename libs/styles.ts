@@ -31,6 +31,7 @@ export const spacing = {
 
 export const radius = {
   normal: 5,
+  large: 10,
 }
 
 export type HeaderSize = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
@@ -51,10 +52,10 @@ export const c = {
   oneLight: '#dbebff',
   oneDark: '#7a899b',
   /** secondary */
-  two: '#42d4ec',
-  twoLight: '#82ffff',
-  twoDark: '#00a2ba',
-  oneVariant: '',
+  two: '#4FC3F7', // '#42d4ec',
+  twoLight: '#4DD0E1',
+  twoDark: '#4FC3F7',
+  oneVariant: '#42d4ec',
   twoVariant: '',
   bg: '#FAFAFA', // '#f6f6f6',
   surf: '#FFFFFF',
@@ -116,6 +117,7 @@ export const s = StyleSheet.create({
   asfe: { alignSelf: 'flex-end' },
   asc: { alignSelf: 'center' },
   ass: { alignSelf: 'stretch' },
+  acsb: { alignContent: 'space-between' },
   /** container */
   c: {
     padding: spacing.container,
@@ -132,6 +134,16 @@ export const s = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+  debug: {
+    borderWidth: 1,
+    borderColor: 'black',
   },
 })
 

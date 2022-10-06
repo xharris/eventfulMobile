@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import { ActivityIndicator, Button, IconButton, Menu, Text, TextInput } from 'react-native-paper'
 import { Eventful } from 'types'
+import { LoadingView } from '../components/LoadingView'
 import { Spacer } from '../components/Spacer'
 import { UNIT_LABEL, useReminders } from '../eventfulLib/reminder'
 import { AreYouSure } from '../libs/dialog'
@@ -76,7 +77,7 @@ const Reminder = ({ reminder }: ReminderProps) => {
 
 export const ReminderEditScreen = ({
   navigation,
-}: Eventful.RN.UserStackScreenProps<'ReminderEdit'>) => {
+}: Eventful.RN.MainStackScreenProps<'ReminderEdit'>) => {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '',
@@ -85,12 +86,12 @@ export const ReminderEditScreen = ({
 
   const { data: reminders, isFetching, isRefetching, addReminder } = useReminders()
 
-  return isFetching && !isRefetching ? (
-    <View style={[s.c, s.flx_1]}>
-      <ActivityIndicator size="large" />
-    </View>
-  ) : (
-    <View style={[s.c, s.flx_1, s.flx_c]}>
+  return (
+    <LoadingView
+      style={[s.c, s.flx_1, s.flx_c]}
+      loading={isFetching && !isRefetching}
+      edges={['left', 'right', 'bottom']}
+    >
       {reminders?.map((reminder) => (
         <Reminder key={reminder._id.toString()} reminder={reminder} />
       ))}
@@ -99,6 +100,6 @@ export const ReminderEditScreen = ({
         icon={(props) => <Feather {...props} name="plus" />}
         onPress={() => addReminder()}
       />
-    </View>
+    </LoadingView>
   )
 }

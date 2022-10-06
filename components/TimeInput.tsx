@@ -20,6 +20,7 @@ interface TimeInput extends ViewProps {
   square?: number | string | true
 }
 
+/** Input for start/end datetime */
 export const TimeInput = ({
   label,
   defaultValue,
@@ -35,14 +36,16 @@ export const TimeInput = ({
   const [value, setValue] = useState(defaultValue)
   const [end, setEnd] = useState<Eventful.TimePart | undefined>(defaultValue?.end)
   const [hasEnd, setHasEnd] = useState(!!defaultValue?.end)
+  const [defaultSet, setDefaultSet] = useState(false)
 
   useEffect(() => {
-    if (defaultValue) {
+    if (defaultValue && !defaultSet) {
       setValue(defaultValue)
       setEnd(defaultValue.end)
       setHasEnd(!!defaultValue?.end)
+      setDefaultSet(true)
     }
-  }, [defaultValue])
+  }, [defaultValue, defaultSet])
 
   const update = useCallback(
     (v: Partial<Eventful.Time> = {}) => {

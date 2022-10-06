@@ -27,10 +27,11 @@ import { useSnackbar } from '../components/Snackbar'
 import { useFormik } from 'formik'
 import { FEEDBACK, useFeedback } from '../eventfulLib/feedback'
 import { extend, getLogs } from '../eventfulLib/log'
+import { LoadingView } from '../components/LoadingView'
 
 const log = extend('USER')
 
-export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenProps<'User'>) => {
+export const UserScreen = ({ navigation, route }: Eventful.RN.MainStackScreenProps<'User'>) => {
   const { user } = route.params
   const { data } = useUser({ id: user?.toString() })
   const { session, logOut } = useSession()
@@ -45,7 +46,7 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
 
   const feedbackForm = useFormik({
     initialValues: {
-      type: 'question',
+      type: 'question' as Eventful.API.FeedbackEdit['type'],
       text: '',
       logs: false,
     },
@@ -67,20 +68,18 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
     },
   })
 
-  const index = useNavigationState((state) => state.index)
-
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '',
       headerRight: () =>
-        index === 0 ? (
+        session?._id === user ? (
           <IconButton
             icon={(props) => <Feather {...props} name="search" />}
             onPress={() => navigation.push('UserSearch')}
           />
         ) : null,
     })
-  }, [navigation, index])
+  }, [navigation, user, session])
 
   const isContact = useMemo(
     () => (user !== session?._id ? contacts?.some((contact) => contact._id === user) : false),
@@ -109,7 +108,11 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
   }, [devPresses, storage])
 
   return (
-    <View style={[s.c, s.flx_c, s.jcsa, s.flx_1]}>
+    <LoadingView
+      style={[s.c, s.flx_c, s.jcsa, s.flx_1]}
+      loading={!data}
+      edges={['left', 'right', 'bottom']}
+    >
       <View style={[s.flx_r, s.jcsa, s.aic, s.flx_1]}>
         <Pressable
           onPress={() => {
@@ -136,6 +139,14 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
               icon={(props) => <Feather {...props} name="users" />}
             >
               Contacts
+            </Button>
+            <Spacer />
+            <Button
+              mode="outlined"
+              onPress={() => navigation.push('Tags', { user })}
+              icon={(props) => <Feather {...props} name="box" />}
+            >
+              Tags
             </Button>
             <Spacer />
             <Button
@@ -262,6 +273,6 @@ export const UserScreen = ({ navigation, route }: Eventful.RN.UserStackScreenPro
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </View>
+    </LoadingView>
   )
 }

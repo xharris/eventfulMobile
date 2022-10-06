@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 
-type Listener<Args extends any[]> = (...args: Args) => void
+type Listener<Args extends any[]> = (value: Args) => void
 
 export const createEvent = <Args extends any[]>() => {
   const listeners: Listener<Args>[] = []
 
-  const emit = (args: Args) => listeners.forEach((fn) => fn(...args))
+  const emit = (args: Args) => listeners.forEach((fn) => fn(args))
 
   const addListener = (fn: Listener<Args>) => listeners.push(fn)
   const removeListener = (fn: Listener<Args>) =>

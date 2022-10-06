@@ -14,6 +14,7 @@ import { Eventful } from 'types'
 import { AvatarGroup } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { H5 } from '../components/Header'
+import { LoadingView } from '../components/LoadingView'
 import { useSnackbar } from '../components/Snackbar'
 import { Spacer } from '../components/Spacer'
 import { TextInput } from '../components/TextInput'
@@ -28,7 +29,7 @@ import { ContactSelectEvent } from './ContactSelect'
 export const PlanEditScreen = ({
   navigation,
   route,
-}: Eventful.RN.EventStackScreenProps<'PlanEdit'>) => {
+}: Eventful.RN.MainStackScreenProps<'PlanEdit'>) => {
   const { plan: planId } = route.params
   const { data: plan, updatePlan, deletePlan, isFetching, isRefetching } = usePlan({ plan: planId })
   const [menuVisible, setMenuVisible] = useState(false)
@@ -89,13 +90,13 @@ export const PlanEditScreen = ({
     setFieldValue('who', users)
   })
 
-  return isFetching && !isRefetching ? (
-    <View style={[s.c, s.flx_1]}>
-      <ActivityIndicator size="large" />
-    </View>
-  ) : (
+  return (
     <Portal.Host>
-      <View style={[s.c, s.flx_1, s.jcsb]}>
+      <LoadingView
+        style={[s.c, s.flx_1, s.jcsb]}
+        loading={isFetching && !isRefetching}
+        edges={['bottom', 'left', 'right']}
+      >
         <KeyboardAvoidingView
           behavior="position"
           keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
@@ -177,7 +178,7 @@ export const PlanEditScreen = ({
             })
           }
         />
-      </View>
+      </LoadingView>
     </Portal.Host>
   )
 }

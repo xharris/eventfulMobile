@@ -63,3 +63,8 @@ download artifact from https://expo.dev
 ```
 npx uri-scheme open com.xhh.eventfulMobile://eventful?eventId=SOME_EVENT_ID
 ```
+
+# Libraries that requied native changes (wip)
+
+- [zoontek/react-native-permissions](https://github.com/zoontek/react-native-permissions)
+- [react-native-maps/react-native-maps](https://github.com/react-native-maps/react-native-maps)
